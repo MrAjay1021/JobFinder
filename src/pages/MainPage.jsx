@@ -328,7 +328,7 @@ const MainPage = () => {
   // Sample job data with updated company logos
   const jobs = [
     {
-      id: "6425f646304f97f4e7cbcde1",
+      id: "frontend-job",
       title: 'Frontend Developer',
       company: 'Figmatech',
       companyLogo: equinixLogo,
@@ -340,9 +340,9 @@ const MainPage = () => {
       skills: ['Frontend', 'CSS', 'JavaScript', 'HTML'],
     },
     {
-      id: "6425f6c1304f97f4e7cbcde2",
-      title: 'WordPress Developer',
-      company: 'WebPress',
+      id: "wordpress-job",
+      title: 'WordPress Development',
+      company: 'Adyaka Infosec Private Limited',
       companyLogo: mediaLogo,
       employeeCount: '11-50',
       salary: 25000,
@@ -352,7 +352,7 @@ const MainPage = () => {
       skills: ['WordPress', 'CSS', 'HTML'],
     },
     {
-      id: "6425f710304f97f4e7cbcde3",
+      id: "frontend-job-2",
       title: 'Frontend Developer',
       company: 'Human Cloud',
       companyLogo: humancloudLogo,
@@ -503,11 +503,11 @@ const MainPage = () => {
               {isAuthenticated ? (
                 <div style={styles.actionButtons}>
                   <Link to={`/edit-job/${job.id}`} style={styles.editButton}>Edit job</Link>
-                  <Link to={`/jobs/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
+                  <Link to={`/view-job-logged-in/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
                 </div>
               ) : (
                 <div style={styles.viewDetailsButton}>
-                  <Link to={`/jobs/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
+                  <Link to={`/view-job/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
                 </div>
               )}
             </div>

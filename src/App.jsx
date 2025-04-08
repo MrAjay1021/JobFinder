@@ -11,6 +11,8 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import JobDetails from './components/JobDetails';
 import MainPage from './pages/MainPage';
+import JobViewDetailsWithoutLogin from './pages/JobViewDetailsWithoutLogin';
+import JobViewDetailsWithLogin from './pages/JobViewDetailsWithLogin';
 
 // Placeholder components - will be implemented later
 const Profile = () => <div>Profile Page</div>;
@@ -27,6 +29,8 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/jobs" element={<Dashboard />} />
             <Route path="/jobs/:id" element={<JobDetails />} />
+            <Route path="/view-job/:id" element={<JobViewDetailsWithoutLogin />} />
+            <Route path="/view-job-logged-in/:id" element={<JobViewDetailsWithLogin />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/post-job" element={<AddJob />} />
             <Route path="/my-applications" element={<MyApplications />} />
