@@ -211,114 +211,140 @@ const styles = {
   jobListings: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px',
+    gap: '20px',
+    marginTop: '20px',
   },
   jobCard: {
     display: 'flex',
-    padding: '20px',
     backgroundColor: 'white',
-    borderRadius: '8px',
+    borderRadius: '10px',
+    overflow: 'hidden',
     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
     position: 'relative',
-    overflow: 'hidden',
+    padding: '20px',
+    border: '1px solid #f0f0f0',
+    backgroundColor: '#fff5f5',
   },
   indicator: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    width: '5px',
+    width: '6px',
     backgroundColor: '#f05252',
   },
   companyLogo: {
-    width: '50px',
-    height: '50px',
+    width: '60px',
+    height: '60px',
     borderRadius: '8px',
-    backgroundColor: '#f5f5f5',
-    marginRight: '20px',
+    overflow: 'hidden',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
+    backgroundColor: '#f0f0f0',
+    marginRight: '15px',
   },
   jobContent: {
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
   },
   jobTitle: {
-    margin: '0 0 10px',
     fontSize: '18px',
-    fontWeight: 600,
+    fontWeight: 'bold',
+    margin: 0,
+    color: '#333',
   },
   jobDetails: {
     display: 'flex',
-    gap: '20px',
-    marginBottom: '10px',
+    gap: '15px',
+    alignItems: 'center',
+    color: '#666',
+    fontSize: '14px',
   },
   jobDetail: {
     display: 'flex',
     alignItems: 'center',
     gap: '5px',
-    fontSize: '14px',
-    color: '#666',
   },
   tagRow: {
     display: 'flex',
     gap: '10px',
-    marginBottom: '10px',
+    marginTop: '5px',
   },
   typeTag: {
-    padding: '4px 8px',
-    backgroundColor: '#f5f5f5',
+    padding: '4px 10px',
     borderRadius: '4px',
-    fontSize: '12px',
-    color: '#666',
+    color: '#f05252',
+    fontSize: '14px',
   },
   skillTags: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '10px',
+    gap: '8px',
+    marginTop: '10px',
   },
   skillTag: {
-    padding: '4px 10px',
-    backgroundColor: '#f5f5f5',
-    borderRadius: '4px',
-    fontSize: '12px',
-    color: '#666',
-  },
-  actionButtons: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    justifyContent: 'center',
-  },
-  editButton: {
-    padding: '8px 16px',
-    backgroundColor: 'transparent',
-    color: '#f05252',
-    borderRadius: '5px',
-    border: '1px solid #f05252',
+    padding: '5px 15px',
+    backgroundColor: '#ffebee',
+    color: '#333',
+    borderRadius: '20px',
     fontSize: '14px',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    textAlign: 'center',
+  },
+  cardFooter: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '15px',
   },
   viewDetailsButton: {
-    padding: '8px 16px',
     backgroundColor: '#f05252',
     color: 'white',
-    borderRadius: '5px',
     border: 'none',
-    fontSize: '14px',
+    borderRadius: '5px',
+    padding: '8px 16px',
     cursor: 'pointer',
     textDecoration: 'none',
-    textAlign: 'center',
+    fontSize: '14px',
   },
-  flagIcon: {
-    width: '20px',
-    height: '15px',
-    marginRight: '5px',
-    objectFit: 'contain'
+  addJobButtonFixed: {
+    position: 'fixed',
+    bottom: '30px',
+    right: '30px',
+    backgroundColor: '#f05252',
+    color: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    width: '60px',
+    height: '60px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '24px',
+    textDecoration: 'none',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+    zIndex: 1000,
+  },
+};
+
+// Helper function to get appropriate logo based on company name
+const getCompanyLogo = (job) => {
+  if (job.logoUrl || job.companyLogoUrl) {
+    return job.logoUrl || job.companyLogoUrl;
   }
+  
+  // Return default logos based on company name pattern
+  const companyName = job.companyName?.toLowerCase() || '';
+  if (companyName.includes('human') || companyName.includes('cloud')) {
+    return humancloudLogo;
+  } else if (companyName.includes('media') || companyName.includes('adyaka')) {
+    return mediaLogo;
+  } else if (companyName.includes('equinix') || companyName.includes('tech') || companyName.includes('figma')) {
+    return equinixLogo;
+  }
+  
+  // Default placeholder
+  return 'https://via.placeholder.com/150';
 };
 
 const MainPage = () => {
@@ -441,7 +467,7 @@ const MainPage = () => {
                   <button 
                     style={styles.closeButton}
                     onClick={() => handleRemoveSkill(skill)}
-                  >✕</button>
+                  >×</button>
                 </div>
               ))}
             </div>
@@ -480,7 +506,7 @@ const MainPage = () => {
                 
                 {/* Company logo */}
                 <div style={styles.companyLogo}>
-                  <img src={job.logoUrl || job.companyLogoUrl || 'https://via.placeholder.com/150'} alt={job.companyName} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                  <img src={getCompanyLogo(job)} alt={job.companyName} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                 </div>
                 
                 {/* Job details */}
@@ -497,13 +523,13 @@ const MainPage = () => {
                       <span>{job.monthlySalary?.toLocaleString() || 'N/A'}</span>
                     </div>
                     <div style={styles.jobDetail}>
-                      <span>📍</span>
+                      <img src={indiaFlag} alt="India" style={{ width: '20px', height: '15px', marginRight: '5px' }} />
                       <span>{job.location}</span>
                     </div>
                   </div>
 
                   <div style={styles.tagRow}>
-                    <span style={styles.typeTag}>{job.remoteOffice || (job.isRemote ? 'Remote' : 'Office')}</span>
+                    <span style={{...styles.typeTag, color: job.isRemote ? '#f05252' : '#f05252'}}>{job.remoteOffice || (job.isRemote ? 'Remote' : 'Office')}</span>
                     <span style={styles.typeTag}>{job.jobType}</span>
                   </div>
 
@@ -515,7 +541,7 @@ const MainPage = () => {
                   
                   <div style={styles.cardFooter}>
                     <Link to={`/view-job-logged-in/${job._id}`} style={styles.viewDetailsButton}>
-                      View Details
+                      View details
                     </Link>
                   </div>
                 </div>
@@ -526,17 +552,7 @@ const MainPage = () => {
 
         {/* Add job button for authenticated users */}
         {isAuthenticated && (
-          <Link to="/post-job" style={{
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            ...styles.addJobButton,
-            borderRadius: '50%',
-            width: '60px',
-            height: '60px',
-            padding: 0,
-            fontSize: '24px'
-          }}>
+          <Link to="/post-job" style={styles.addJobButtonFixed}>
             +
           </Link>
         )}

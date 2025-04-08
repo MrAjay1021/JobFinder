@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { jobsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Header from './Header';
@@ -8,7 +8,27 @@ import Header from './Header';
 const styles = {
   container: {
     display: 'flex',
+    flexDirection: 'column',
     minHeight: '100vh',
+  },
+  headerBar: {
+    backgroundColor: '#f05252',
+    padding: '15px 20px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomLeftRadius: '25px',
+    borderBottomRightRadius: '25px',
+  },
+  headerLogo: {
+    color: 'white',
+    fontSize: '24px',
+    fontWeight: 'bold',
+    textDecoration: 'none'
+  },
+  formContainer: {
+    display: 'flex',
+    flex: 1,
   },
   leftSection: {
     flex: '1',
@@ -132,6 +152,7 @@ const styles = {
 
 const AddJob = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); // Get job ID from URL
   const { isAuthenticated, user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentSkill, setCurrentSkill] = useState('');
@@ -151,8 +172,23 @@ const AddJob = () => {
     additionalInfo: ''
   });
 
+  // Fetch job details if editing
+  useEffect(() => {
+    if (id) {
+      const fetchJobDetails = async () => {
+        try {
+          const response = await jobsAPI.getJobById(id);
+          setJobData(response.data);
+        } catch (error) {
+          console.error('Failed to fetch job details:', error);
+        }
+      };
+      fetchJobDetails();
+    }
+  }, [id]);
+
   // Redirect if not authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
     }
@@ -248,14 +284,24 @@ const AddJob = () => {
         formattedData.postedBy = user._id;
       }
       
-      console.log('Submitting simplified job data:', formattedData);
+      console.log('Submitting job data:', formattedData);
       
-      const response = await jobsAPI.createJob(formattedData);
-      console.log('Job created successfully:', response);
-      alert('Job posted successfully!');
+      let response;
+      if (id) {
+        // Update existing job
+        response = await jobsAPI.updateJob(id, formattedData);
+        console.log('Job updated successfully:', response);
+        alert('Job updated successfully!');
+      } else {
+        // Create new job
+        response = await jobsAPI.createJob(formattedData);
+        console.log('Job created successfully:', response);
+        alert('Job posted successfully!');
+      }
+      
       navigate('/');
     } catch (error) {
-      console.error('Error posting job:', error);
+      console.error('Error saving job:', error);
       
       let errorMsg = 'Failed to save job. ';
       
@@ -276,224 +322,232 @@ const AddJob = () => {
 
   return (
     <div style={styles.container}>
-      {/* Left Section - Form */}
-      <div style={styles.leftSection}>
-        <h1 style={styles.heading}>Add job description</h1>
-        
-        <form onSubmit={handleSubmit}>
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="companyName">Company Name</label>
-            <input
-              style={styles.input}
-              type="text"
-              id="companyName"
-              name="companyName"
-              value={jobData.companyName}
-              onChange={handleInputChange}
-              placeholder="Enter your company name here"
-            />
-            {formErrors.companyName && <div style={styles.errorText}>{formErrors.companyName}</div>}
-          </div>
+      {/* Header with company name */}
+      <div style={styles.headerBar}>
+        <Link to="/" style={styles.headerLogo}>Jobfinder</Link>
+      </div>
+      
+      {/* Form Container */}
+      <div style={styles.formContainer}>
+        {/* Left Section - Form */}
+        <div style={styles.leftSection}>
+          <h1 style={styles.heading}>{id ? 'Edit job description' : 'Add job description'}</h1>
           
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="companyLogoUrl">Add logo URL</label>
-            <input
-              style={styles.input}
-              type="text"
-              id="companyLogoUrl"
-              name="companyLogoUrl"
-              value={jobData.companyLogoUrl}
-              onChange={handleInputChange}
-              placeholder="Enter the link"
-            />
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="title">Job position</label>
-            <input
-              style={styles.input}
-              type="text"
-              id="title"
-              name="title"
-              value={jobData.title}
-              onChange={handleInputChange}
-              placeholder="Enter job position"
-            />
-            {formErrors.title && <div style={styles.errorText}>{formErrors.title}</div>}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="monthlySalary">Monthly salary</label>
-            <input
-              style={styles.input}
-              type="text"
-              id="monthlySalary"
-              name="monthlySalary"
-              value={jobData.monthlySalary}
-              onChange={handleInputChange}
-              placeholder="Enter Amount in rupees"
-            />
-            {formErrors.monthlySalary && <div style={styles.errorText}>{formErrors.monthlySalary}</div>}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="jobType">Job Type</label>
-            <select
-              style={styles.select}
-              id="jobType"
-              name="jobType"
-              value={jobData.jobType}
-              onChange={handleInputChange}
-            >
-              <option value="Select">Select</option>
-              <option value="Full Time">Full Time</option>
-              <option value="Part Time">Part Time</option>
-              <option value="Contract">Contract</option>
-              <option value="Internship">Internship</option>
-              <option value="Freelance">Freelance</option>
-            </select>
-            {formErrors.jobType && <div style={styles.errorText}>{formErrors.jobType}</div>}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="remoteOption">Remote/office</label>
-            <select
-              style={styles.select}
-              id="remoteOption"
-              name="remoteOption"
-              value={jobData.remoteOption}
-              onChange={handleInputChange}
-            >
-              <option value="Select">Select</option>
-              <option value="Remote">Remote</option>
-              <option value="Office">Office</option>
-              <option value="Hybrid">Hybrid</option>
-            </select>
-            {formErrors.remoteOption && <div style={styles.errorText}>{formErrors.remoteOption}</div>}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="location">Location</label>
-            <input
-              style={styles.input}
-              type="text"
-              id="location"
-              name="location"
-              value={jobData.location}
-              onChange={handleInputChange}
-              placeholder="Enter Location"
-            />
-            {formErrors.location && <div style={styles.errorText}>{formErrors.location}</div>}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="description">Job Description</label>
-            <textarea
-              style={styles.textarea}
-              id="description"
-              name="description"
-              value={jobData.description}
-              onChange={handleInputChange}
-              placeholder="Type the job description"
-            ></textarea>
-            {formErrors.description && <div style={styles.errorText}>{formErrors.description}</div>}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="aboutCompany">About Company</label>
-            <textarea
-              style={styles.textarea}
-              id="aboutCompany"
-              name="aboutCompany"
-              value={jobData.aboutCompany}
-              onChange={handleInputChange}
-              placeholder="Type about your company"
-            ></textarea>
-            {formErrors.aboutCompany && <div style={styles.errorText}>{formErrors.aboutCompany}</div>}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="skillsInput">Skills Required</label>
-            <div style={{ display: 'flex', position: 'relative' }}>
+          <form onSubmit={handleSubmit}>
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="companyName">Company Name</label>
               <input
                 style={styles.input}
                 type="text"
-                id="skillsInput"
-                value={currentSkill}
-                onChange={(e) => setCurrentSkill(e.target.value)}
-                placeholder="Enter the must have skills"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddSkill();
-                  }
-                }}
+                id="companyName"
+                name="companyName"
+                value={jobData.companyName}
+                onChange={handleInputChange}
+                placeholder="Enter your company name here"
               />
-              <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }}>▼</div>
+              {formErrors.companyName && <div style={styles.errorText}>{formErrors.companyName}</div>}
             </div>
-            {formErrors.skillsRequired && <div style={styles.errorText}>{formErrors.skillsRequired}</div>}
             
-            {jobData.skillsRequired.length > 0 && (
-              <div style={styles.skillsContainer}>
-                {jobData.skillsRequired.map((skill, index) => (
-                  <div key={index} style={styles.skillTag}>
-                    {skill}
-                    <span 
-                      style={styles.skillClose} 
-                      onClick={() => handleRemoveSkill(skill)}
-                    >×</span>
-                  </div>
-                ))}
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="companyLogoUrl">Add logo URL</label>
+              <input
+                style={styles.input}
+                type="text"
+                id="companyLogoUrl"
+                name="companyLogoUrl"
+                value={jobData.companyLogoUrl}
+                onChange={handleInputChange}
+                placeholder="Enter the link"
+              />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="title">Job position</label>
+              <input
+                style={styles.input}
+                type="text"
+                id="title"
+                name="title"
+                value={jobData.title}
+                onChange={handleInputChange}
+                placeholder="Enter job position"
+              />
+              {formErrors.title && <div style={styles.errorText}>{formErrors.title}</div>}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="monthlySalary">Monthly salary</label>
+              <input
+                style={styles.input}
+                type="text"
+                id="monthlySalary"
+                name="monthlySalary"
+                value={jobData.monthlySalary}
+                onChange={handleInputChange}
+                placeholder="Enter Amount in rupees"
+              />
+              {formErrors.monthlySalary && <div style={styles.errorText}>{formErrors.monthlySalary}</div>}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="jobType">Job Type</label>
+              <select
+                style={styles.select}
+                id="jobType"
+                name="jobType"
+                value={jobData.jobType}
+                onChange={handleInputChange}
+              >
+                <option value="Select">Select</option>
+                <option value="Full Time">Full Time</option>
+                <option value="Part Time">Part Time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+                <option value="Freelance">Freelance</option>
+              </select>
+              {formErrors.jobType && <div style={styles.errorText}>{formErrors.jobType}</div>}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="remoteOption">Remote/office</label>
+              <select
+                style={styles.select}
+                id="remoteOption"
+                name="remoteOption"
+                value={jobData.remoteOption}
+                onChange={handleInputChange}
+              >
+                <option value="Select">Select</option>
+                <option value="Remote">Remote</option>
+                <option value="Office">Office</option>
+                <option value="Hybrid">Hybrid</option>
+              </select>
+              {formErrors.remoteOption && <div style={styles.errorText}>{formErrors.remoteOption}</div>}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="location">Location</label>
+              <input
+                style={styles.input}
+                type="text"
+                id="location"
+                name="location"
+                value={jobData.location}
+                onChange={handleInputChange}
+                placeholder="Enter Location"
+              />
+              {formErrors.location && <div style={styles.errorText}>{formErrors.location}</div>}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="description">Job Description</label>
+              <textarea
+                style={styles.textarea}
+                id="description"
+                name="description"
+                value={jobData.description}
+                onChange={handleInputChange}
+                placeholder="Type the job description"
+              ></textarea>
+              {formErrors.description && <div style={styles.errorText}>{formErrors.description}</div>}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="aboutCompany">About Company</label>
+              <textarea
+                style={styles.textarea}
+                id="aboutCompany"
+                name="aboutCompany"
+                value={jobData.aboutCompany}
+                onChange={handleInputChange}
+                placeholder="Type about your company"
+              ></textarea>
+              {formErrors.aboutCompany && <div style={styles.errorText}>{formErrors.aboutCompany}</div>}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="skillsInput">Skills Required</label>
+              <div style={{ display: 'flex', position: 'relative' }}>
+                <input
+                  style={styles.input}
+                  type="text"
+                  id="skillsInput"
+                  value={currentSkill}
+                  onChange={(e) => setCurrentSkill(e.target.value)}
+                  placeholder="Enter the must have skills"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddSkill();
+                    }
+                  }}
+                />
+                <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }}>▼</div>
               </div>
-            )}
-          </div>
-          
-          <div style={styles.formGroup}>
-            <label style={styles.label} htmlFor="additionalInfo">Information</label>
-            <input
-              style={styles.input}
-              type="text"
-              id="additionalInfo"
-              name="additionalInfo"
-              value={jobData.additionalInfo}
-              onChange={handleInputChange}
-              placeholder="Enter the additional information"
-            />
-          </div>
-          
-          <div style={styles.buttonRow}>
-            <button 
-              type="button" 
-              style={styles.cancelButton}
-              onClick={() => navigate('/dashboard')}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              style={styles.submitButton}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Posting...' : '+ Add Job'}
-            </button>
-          </div>
-        </form>
-      </div>
-      
-      {/* Right Section - Black background with illustration */}
-      <div style={styles.rightSection}>
-        <h2 style={styles.rightHeading}>Recruiter add job details here</h2>
+              {formErrors.skillsRequired && <div style={styles.errorText}>{formErrors.skillsRequired}</div>}
+              
+              {jobData.skillsRequired.length > 0 && (
+                <div style={styles.skillsContainer}>
+                  {jobData.skillsRequired.map((skill, index) => (
+                    <div key={index} style={styles.skillTag}>
+                      {skill}
+                      <span 
+                        style={styles.skillClose} 
+                        onClick={() => handleRemoveSkill(skill)}
+                      >×</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="additionalInfo">Information</label>
+              <input
+                style={styles.input}
+                type="text"
+                id="additionalInfo"
+                name="additionalInfo"
+                value={jobData.additionalInfo}
+                onChange={handleInputChange}
+                placeholder="Enter the additional information"
+              />
+            </div>
+            
+            <div style={styles.buttonRow}>
+              <button 
+                type="button" 
+                style={styles.cancelButton}
+                onClick={() => navigate('/dashboard')}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                style={styles.submitButton}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving...' : id ? 'Update Job' : '+ Add Job'}
+              </button>
+            </div>
+          </form>
+        </div>
         
-        <div style={styles.illustration}>
-          {/* This is where the colorful code elements would go */}
-          <svg width="300" height="300" viewBox="0 0 400 400">
-            <circle cx="200" cy="200" r="50" fill="#FF6B6B" />
-            <rect x="100" y="100" width="80" height="80" fill="#48CFAD" />
-            <polygon points="300,100 350,200 300,300" fill="#FFCE54" />
-            <path d="M50,250 C50,150 150,150 150,250" stroke="#AC92EC" strokeWidth="8" fill="none" />
-            <circle cx="100" cy="300" r="30" fill="#FC6E51" />
-            <circle cx="300" cy="150" r="20" fill="#4FC1E9" />
-          </svg>
+        {/* Right Section - Black background with illustration */}
+        <div style={styles.rightSection}>
+          <h2 style={styles.rightHeading}>Recruiter add job details here</h2>
+          
+          <div style={styles.illustration}>
+            {/* This is where the colorful code elements would go */}
+            <svg width="300" height="300" viewBox="0 0 400 400">
+              <circle cx="200" cy="200" r="50" fill="#FF6B6B" />
+              <rect x="100" y="100" width="80" height="80" fill="#48CFAD" />
+              <polygon points="300,100 350,200 300,300" fill="#FFCE54" />
+              <path d="M50,250 C50,150 150,150 150,250" stroke="#AC92EC" strokeWidth="8" fill="none" />
+              <circle cx="100" cy="300" r="30" fill="#FC6E51" />
+              <circle cx="300" cy="150" r="20" fill="#4FC1E9" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>
