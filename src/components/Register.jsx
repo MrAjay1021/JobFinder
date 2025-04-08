@@ -1,7 +1,156 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import '../styles/Auth.css';
+import authBackground from '../assets/images/auth-background.jpg';
+
+const styles = {
+  container: {
+    backgroundColor: '#ffffff',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    minHeight: '100vh',
+  },
+  formColumn: {
+    marginTop: '80px',
+    width: '44%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    padding: '0 40px',
+  },
+  title: {
+    fontSize: '32px',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: '10px',
+  },
+  subtitle: {
+    fontSize: '18px',
+    color: '#666',
+    marginBottom: '30px',
+  },
+  form: {
+    width: '100%',
+  },
+  formGroup: {
+    marginBottom: '24px',
+    width: '100%',
+  },
+  input: {
+    color: '#595959',
+    padding: '15px 26px',
+    fontSize: '16px',
+    borderColor: '#9c9c9c',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    backgroundColor: '#ffffff',
+    width: '100%',
+    height: '50px',
+    borderRadius: '5px',
+    outline: 'none',
+  },
+  submitButton: {
+    color: '#ffffff',
+    marginTop: '24px',
+    padding: '12px 30px',
+    fontSize: '18px',
+    fontWeight: '700',
+    backgroundColor: '#ed5353',
+    height: '50px',
+    minWidth: '150px',
+    borderRadius: '5px',
+    border: 'none',
+    cursor: 'pointer',
+    width: '100%',
+  },
+  linkRow: {
+    marginTop: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  linkText: {
+    color: '#666',
+    fontSize: '16px',
+  },
+  link: {
+    color: '#ed5353',
+    fontSize: '16px',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+  },
+  imageColumn: {
+    height: '100vh',
+    width: '56%',
+    backgroundImage: `url(${authBackground})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageText: {
+    fontSize: '32px',
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    maxWidth: '80%',
+    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+  },
+  errorText: {
+    color: '#ed5353',
+    marginBottom: '15px',
+    fontSize: '14px',
+  },
+  checkboxContainer: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '10px',
+    marginBottom: '20px',
+  },
+  customCheckbox: {
+    width: '20px',
+    height: '20px',
+    borderRadius: '4px',
+    border: '1px solid #9c9c9c',
+    backgroundColor: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    position: 'relative',
+  },
+  checkedCheckbox: {
+    backgroundColor: '#ed5353',
+    border: '1px solid #ed5353',
+  },
+  checkboxLabel: {
+    fontSize: '14px',
+    color: '#666',
+    flex: 1,
+  },
+  checkmark: {
+    color: 'white',
+    fontSize: '14px',
+  },
+  // Media queries would need to be handled with JavaScript in inline styles
+  '@media (max-width: 1050px)': {
+    container: {
+      flexDirection: 'column',
+    },
+    formColumn: {
+      width: '100%',
+      paddingLeft: '20px',
+      paddingRight: '20px',
+    },
+    imageColumn: {
+      width: '100%',
+      height: '300px',
+    },
+  }
+};
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -40,20 +189,42 @@ const Register = () => {
     }
   };
 
+  // Apply responsive styles based on window width
+  const isMobile = window.innerWidth <= 1050;
+  const containerStyle = {
+    ...styles.container,
+    ...(isMobile ? { flexDirection: 'column' } : {})
+  };
+  
+  const formColumnStyle = {
+    ...styles.formColumn,
+    ...(isMobile ? { width: '100%', paddingLeft: '20px', paddingRight: '20px' } : {})
+  };
+  
+  const imageColumnStyle = {
+    ...styles.imageColumn,
+    ...(isMobile ? { width: '100%', height: '300px' } : {})
+  };
+
+  const checkboxStyle = {
+    ...styles.customCheckbox,
+    ...(formData.agreeToTerms ? styles.checkedCheckbox : {})
+  };
+
   return (
-    <div className="auth-container">
-      <div className="auth-form-container">
-        <h1 className="auth-title">Create an account</h1>
-        <p className="auth-subtitle">Your personal job finder is here</p>
+    <div style={containerStyle}>
+      <div style={formColumnStyle}>
+        <h1 style={styles.title}>Create an account</h1>
+        <p style={styles.subtitle}>Your personal job finder is here</p>
         
-        {error && <div className="auth-error">{error}</div>}
+        {error && <div style={styles.errorText}>{error}</div>}
         
-        <form className="auth-form register-form" onSubmit={handleSubmit}>
-          <div className="form-group">
+        <form style={styles.form} onSubmit={handleSubmit}>
+          <div style={styles.formGroup}>
             <input
               type="text"
               name="name"
-              className="form-control"
+              style={styles.input}
               placeholder="Name"
               value={formData.name}
               onChange={handleChange}
@@ -61,11 +232,11 @@ const Register = () => {
             />
           </div>
           
-          <div className="form-group">
+          <div style={styles.formGroup}>
             <input
               type="email"
               name="email"
-              className="form-control"
+              style={styles.input}
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
@@ -73,11 +244,11 @@ const Register = () => {
             />
           </div>
           
-          <div className="form-group">
+          <div style={styles.formGroup}>
             <input
               type="tel"
               name="mobile"
-              className="form-control"
+              style={styles.input}
               placeholder="Mobile"
               value={formData.mobile}
               onChange={handleChange}
@@ -85,11 +256,11 @@ const Register = () => {
             />
           </div>
           
-          <div className="form-group">
+          <div style={styles.formGroup}>
             <input
               type="password"
               name="password"
-              className="form-control"
+              style={styles.input}
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
@@ -97,38 +268,38 @@ const Register = () => {
             />
           </div>
           
-          <div className="checkbox-container">
-            <div className="custom-checkbox">
-              <input
-                type="checkbox"
-                name="agreeToTerms"
-                id="agreeToTerms"
-                checked={formData.agreeToTerms}
-                onChange={handleChange}
-                style={{ opacity: 0, position: 'absolute' }}
-              />
+          <div style={styles.checkboxContainer}>
+            <div 
+              style={checkboxStyle} 
+              onClick={() => setFormData({...formData, agreeToTerms: !formData.agreeToTerms})}
+            >
               {formData.agreeToTerms && (
-                <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7.42857 14L3 9.57143L4.57143 8L7.42857 10.8571L14.4286 3.85714L16 5.42857L7.42857 14Z" fill="white"/>
-                </svg>
+                <span style={styles.checkmark}>✓</span>
               )}
             </div>
-            <label htmlFor="agreeToTerms" className="checkbox-label">
+            <label style={styles.checkboxLabel}>
               By creating an account, I agree to our terms of use and privacy policy
             </label>
+            <input
+              type="checkbox"
+              name="agreeToTerms"
+              checked={formData.agreeToTerms}
+              onChange={handleChange}
+              style={{ display: 'none' }}
+            />
           </div>
           
-          <button type="submit" className="auth-btn">Create Account</button>
+          <button type="submit" style={styles.submitButton}>Create Account</button>
           
-          <div className="auth-link-container">
-            <span className="auth-link-text">Already have an account?</span>
-            <Link to="/login" className="auth-link">Sign In</Link>
+          <div style={styles.linkRow}>
+            <span style={styles.linkText}>Already have an account?</span>
+            <Link to="/login" style={styles.link}>Sign In</Link>
           </div>
         </form>
       </div>
       
-      <div className="auth-image" style={{ backgroundImage: `url(${require('../assets/image466.png')})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        <h2 className="auth-image-text">Your Personal Job Finder</h2>
+      <div style={imageColumnStyle}>
+        <h2 style={styles.imageText}>Your Personal Job Finder</h2>
       </div>
     </div>
   );
