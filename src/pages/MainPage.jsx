@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 // Import images from assets
 import humancloudLogo from '../assets/images/humancloud.png';
 import mediaLogo from '../assets/images/media.png';
 import equinixLogo from '../assets/images/equinix.png';
 import indiaFlag from '../assets/images/India.png';
+import userloggedin from '../assets/images/userloggedin.png';
 
 // Directly implement the CSS styles to match the screenshot
 const styles = {
@@ -63,6 +65,51 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  userProfile: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
+  },
+  logoutButton: {
+    padding: '8px 20px',
+    borderRadius: '20px',
+    fontSize: '14px',
+    border: '1px solid white',
+    backgroundColor: 'transparent',
+    color: 'white',
+    textDecoration: 'none',
+    cursor: 'pointer'
+  },
+  userInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    color: 'white'
+  },
+  userAvatar: {
+    width: '30px',
+    height: '30px',
+    borderRadius: '50%',
+    objectFit: 'cover'
+  },
+  addJobButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '8px 20px',
+    backgroundColor: '#f05252',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    textDecoration: 'none'
+  },
+  plusIcon: {
+    marginRight: '5px',
+    fontSize: '16px',
+    fontWeight: 'bold'
   },
   content: {
     maxWidth: '1200px',
@@ -237,11 +284,24 @@ const styles = {
     fontSize: '12px',
     color: '#666',
   },
-  viewDetailsButton: {
+  actionButtons: {
     display: 'flex',
-    alignItems: 'center',
+    flexDirection: 'column',
+    gap: '10px',
+    justifyContent: 'center',
   },
-  detailsButton: {
+  editButton: {
+    padding: '8px 16px',
+    backgroundColor: 'transparent',
+    color: '#f05252',
+    borderRadius: '5px',
+    border: '1px solid #f05252',
+    fontSize: '14px',
+    cursor: 'pointer',
+    textDecoration: 'none',
+    textAlign: 'center',
+  },
+  viewDetailsButton: {
     padding: '8px 16px',
     backgroundColor: '#f05252',
     color: 'white',
@@ -250,6 +310,7 @@ const styles = {
     fontSize: '14px',
     cursor: 'pointer',
     textDecoration: 'none',
+    textAlign: 'center',
   },
   flagIcon: {
     width: '20px',
@@ -260,6 +321,7 @@ const styles = {
 };
 
 const MainPage = () => {
+  const { isAuthenticated, user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSkills, setSelectedSkills] = useState(['Frontend', 'CSS', 'JavaScript']);
   
@@ -315,16 +377,31 @@ const MainPage = () => {
     setSelectedSkills([]);
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <div style={styles.mainContainer}>
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.headerContent}>
           <Link to="/" style={styles.headerLogo}>Jobfinder</Link>
-          <div style={styles.authButtons}>
-            <Link to="/login" style={styles.loginButton}>Login</Link>
-            <Link to="/register" style={styles.registerButton}>Register</Link>
-          </div>
+          
+          {isAuthenticated ? (
+            <div style={styles.userProfile}>
+              <button style={styles.logoutButton} onClick={handleLogout}>Logout</button>
+              <div style={styles.userInfo}>
+                <span>Hello! {user?.name || 'Recruiter'}</span>
+                <img src={userloggedin} alt="User" style={styles.userAvatar} />
+              </div>
+            </div>
+          ) : (
+            <div style={styles.authButtons}>
+              <Link to="/login" style={styles.loginButton}>Login</Link>
+              <Link to="/register" style={styles.registerButton}>Register</Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -366,6 +443,11 @@ const MainPage = () => {
             </div>
 
             <div style={styles.buttonContainer}>
+              {isAuthenticated && (
+                <Link to="/post-job" style={styles.addJobButton}>
+                  <span style={styles.plusIcon}>+</span> Add Job
+                </Link>
+              )}
               <button style={styles.applyButton}>Apply Filter</button>
               <button 
                 style={styles.clearButton}
@@ -418,9 +500,16 @@ const MainPage = () => {
                 </div>
               </div>
 
-              <div style={styles.viewDetailsButton}>
-                <Link to={`/jobs/${job.id}`} style={styles.detailsButton}>View details</Link>
-              </div>
+              {isAuthenticated ? (
+                <div style={styles.actionButtons}>
+                  <Link to={`/edit-job/${job.id}`} style={styles.editButton}>Edit job</Link>
+                  <Link to={`/jobs/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
+                </div>
+              ) : (
+                <div style={styles.viewDetailsButton}>
+                  <Link to={`/jobs/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
+                </div>
+              )}
             </div>
           ))}
         </div>
