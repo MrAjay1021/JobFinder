@@ -11,6 +11,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import JobDetails from './components/JobDetails';
 import MainPage from './pages/MainPage';
+import MainPageWithoutLogin from './pages/MainPageWithoutLogin';
 import JobViewDetailsWithoutLogin from './pages/JobViewDetailsWithoutLogin';
 import JobViewDetailsWithLogin from './pages/JobViewDetailsWithLogin';
 
@@ -25,6 +26,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/" element={<MainPage />} />
+            <Route path="/main" element={<MainPageWithoutLogin />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/jobs" element={<Dashboard />} />
@@ -34,6 +36,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/post-job" element={<AddJob />} />
             <Route path="/my-applications" element={<MyApplications />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </div>
       </Router>

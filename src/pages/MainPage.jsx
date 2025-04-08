@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { jobsAPI } from '../services/api';
 
 // Import images from assets
 import humancloudLogo from '../assets/images/humancloud.png';
@@ -324,49 +325,39 @@ const MainPage = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSkills, setSelectedSkills] = useState(['Frontend', 'CSS', 'JavaScript']);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // Sample job data with updated company logos
-  const jobs = [
-    {
-      id: "frontend-job",
-      title: 'Frontend Developer',
-      company: 'Figmatech',
-      companyLogo: equinixLogo,
-      employeeCount: '11-50',
-      salary: 50000,
-      location: 'Delhi',
-      isRemote: false,
-      jobType: 'Full time',
-      skills: ['Frontend', 'CSS', 'JavaScript', 'HTML'],
-    },
-    {
-      id: "wordpress-job",
-      title: 'WordPress Development',
-      company: 'Adyaka Infosec Private Limited',
-      companyLogo: mediaLogo,
-      employeeCount: '11-50',
-      salary: 25000,
-      location: 'Bangalore',
-      isRemote: true,
-      jobType: 'Full time',
-      skills: ['WordPress', 'CSS', 'HTML'],
-    },
-    {
-      id: "frontend-job-2",
-      title: 'Frontend Developer',
-      company: 'Human Cloud',
-      companyLogo: humancloudLogo,
-      employeeCount: '11-50',
-      salary: 35000,
-      location: 'Mumbai',
-      isRemote: false,
-      jobType: 'Full time',
-      skills: ['Frontend', 'CSS', 'JavaScript', 'HTML'],
+  // Fetch jobs on component mount
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+  
+  // Fetch jobs function
+  const fetchJobs = async (queryFilters = {}) => {
+    setLoading(true);
+    try {
+      const response = await jobsAPI.getAllJobs(queryFilters);
+      setJobs(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch jobs. Please try again later.');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
+    // Optional: Add debounce here for search on type
+  };
+
+  // Apply search filter when submit or enter is pressed
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    fetchJobs({ title: searchTerm });
   };
 
   const handleRemoveSkill = (skillToRemove) => {
@@ -375,6 +366,19 @@ const MainPage = () => {
 
   const handleClearFilters = () => {
     setSelectedSkills([]);
+    setSearchTerm('');
+    fetchJobs(); // Fetch all jobs again with no filters
+  };
+
+  const handleApplyFilter = () => {
+    const queryFilters = {};
+    if (selectedSkills.length > 0) {
+      queryFilters.skills = selectedSkills.join(',');
+    }
+    if (searchTerm) {
+      queryFilters.title = searchTerm;
+    }
+    fetchJobs(queryFilters);
   };
 
   const handleLogout = () => {
@@ -408,7 +412,7 @@ const MainPage = () => {
       {/* Main Content */}
       <div style={styles.content}>
         <div style={styles.searchContainer}>
-          <div style={styles.searchBox}>
+          <form style={styles.searchBox} onSubmit={handleSearchSubmit}>
             <input
               type="text"
               placeholder="Type any job title"
@@ -422,7 +426,7 @@ const MainPage = () => {
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
             </span>
-          </div>
+          </form>
 
           <div style={styles.filterRow}>
             <div style={styles.filterDropdown}>
@@ -448,7 +452,10 @@ const MainPage = () => {
                   <span style={styles.plusIcon}>+</span> Add Job
                 </Link>
               )}
-              <button style={styles.applyButton}>Apply Filter</button>
+              <button 
+                style={styles.applyButton}
+                onClick={handleApplyFilter}
+              >Apply Filter</button>
               <button 
                 style={styles.clearButton}
                 onClick={handleClearFilters}
@@ -459,60 +466,80 @@ const MainPage = () => {
 
         {/* Job Listings */}
         <div style={styles.jobListings}>
-          {jobs.map(job => (
-            <div key={job.id} style={styles.jobCard}>
-              {/* Red indicator line */}
-              <div style={styles.indicator}></div>
-              
-              {/* Company logo */}
-              <div style={styles.companyLogo}>
-                <img src={job.companyLogo} alt={job.company} style={{ maxWidth: '100%', maxHeight: '100%' }} />
-              </div>
-              
-              {/* Job details */}
-              <div style={styles.jobContent}>
-                <h3 style={styles.jobTitle}>{job.title}</h3>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>Loading jobs...</div>
+          ) : error ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>{error}</div>
+          ) : jobs.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>No jobs found</div>
+          ) : (
+            jobs.map(job => (
+              <div key={job._id} style={styles.jobCard}>
+                {/* Red indicator line */}
+                <div style={styles.indicator}></div>
                 
-                <div style={styles.jobDetails}>
-                  <div style={styles.jobDetail}>
-                    <span>👥</span>
-                    <span>{job.employeeCount}</span>
-                  </div>
-                  <div style={styles.jobDetail}>
-                    <span>₹</span>
-                    <span>{job.salary.toLocaleString()}</span>
-                  </div>
-                  <div style={styles.jobDetail}>
-                    <img src={indiaFlag} alt="India" style={styles.flagIcon} />
-                    <span>{job.location}</span>
-                  </div>
+                {/* Company logo */}
+                <div style={styles.companyLogo}>
+                  <img src={job.logoUrl || job.companyLogoUrl || 'https://via.placeholder.com/150'} alt={job.companyName} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                 </div>
+                
+                {/* Job details */}
+                <div style={styles.jobContent}>
+                  <h3 style={styles.jobTitle}>{job.title}</h3>
+                  
+                  <div style={styles.jobDetails}>
+                    <div style={styles.jobDetail}>
+                      <span>👥</span>
+                      <span>{job.companySize || '11-50'}</span>
+                    </div>
+                    <div style={styles.jobDetail}>
+                      <span>₹</span>
+                      <span>{job.monthlySalary?.toLocaleString() || 'N/A'}</span>
+                    </div>
+                    <div style={styles.jobDetail}>
+                      <span>📍</span>
+                      <span>{job.location}</span>
+                    </div>
+                  </div>
 
-                <div style={styles.tagRow}>
-                  <span style={styles.typeTag}>{job.isRemote ? 'Remote' : 'Office'}</span>
-                  <span style={styles.typeTag}>{job.jobType}</span>
-                </div>
+                  <div style={styles.tagRow}>
+                    <span style={styles.typeTag}>{job.remoteOffice || (job.isRemote ? 'Remote' : 'Office')}</span>
+                    <span style={styles.typeTag}>{job.jobType}</span>
+                  </div>
 
-                <div style={styles.skillTags}>
-                  {job.skills.map((skill, index) => (
-                    <span key={index} style={styles.skillTag}>{skill}</span>
-                  ))}
+                  <div style={styles.skillTags}>
+                    {job.skillsRequired && job.skillsRequired.map((skill, index) => (
+                      <span key={index} style={styles.skillTag}>{skill}</span>
+                    ))}
+                  </div>
+                  
+                  <div style={styles.cardFooter}>
+                    <Link to={`/view-job-logged-in/${job._id}`} style={styles.viewDetailsButton}>
+                      View Details
+                    </Link>
+                  </div>
                 </div>
               </div>
-
-              {isAuthenticated ? (
-                <div style={styles.actionButtons}>
-                  <Link to={`/edit-job/${job.id}`} style={styles.editButton}>Edit job</Link>
-                  <Link to={`/view-job-logged-in/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
-                </div>
-              ) : (
-                <div style={styles.viewDetailsButton}>
-                  <Link to={`/view-job/${job.id}`} style={styles.viewDetailsButton}>View details</Link>
-                </div>
-              )}
-            </div>
-          ))}
+            ))
+          )}
         </div>
+
+        {/* Add job button for authenticated users */}
+        {isAuthenticated && (
+          <Link to="/post-job" style={{
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            ...styles.addJobButton,
+            borderRadius: '50%',
+            width: '60px',
+            height: '60px',
+            padding: 0,
+            fontSize: '24px'
+          }}>
+            +
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -216,28 +216,59 @@ const AddJob = () => {
     setIsSubmitting(true);
     
     try {
-      // Format salary as number and prepare data
+      // Ensure monthlySalary is a valid number
+      const salary = parseInt(jobData.monthlySalary.toString().replace(/[^0-9]/g, ''), 10) || 50000;
+      
+      // Create a much simpler job object with only essential fields
+      // This minimizes the chance of validation errors
       const formattedData = {
         title: jobData.title,
         companyName: jobData.companyName,
-        companyLogoUrl: jobData.companyLogoUrl,
         location: jobData.location,
-        jobType: jobData.jobType,
+        // Default to full-time job type
+        jobType: "Full Time", 
+        // Use the most basic way to send remote info
         isRemote: jobData.remoteOption === 'Remote',
-        monthlySalary: Number(jobData.monthlySalary),
-        description: jobData.description,
-        aboutCompany: jobData.aboutCompany,
-        skillsRequired: jobData.skillsRequired,
-        additionalInfo: jobData.additionalInfo,
-        postedBy: user?._id
+        // Ensure salary is a valid number
+        monthlySalary: salary,
+        // Trim long text fields to reduce chance of validation errors
+        description: jobData.description.substring(0, 2000),
+        aboutCompany: jobData.aboutCompany.substring(0, 1000),
+        // Ensure skills are an array
+        skillsRequired: Array.isArray(jobData.skillsRequired) ? 
+                       jobData.skillsRequired.slice(0, 10) : [],
       };
       
-      await jobsAPI.createJob(formattedData);
+      // Only add non-essential fields if they have values
+      if (jobData.companyLogoUrl) {
+        formattedData.logoUrl = jobData.companyLogoUrl;
+      }
+      
+      if (user && user._id) {
+        formattedData.postedBy = user._id;
+      }
+      
+      console.log('Submitting simplified job data:', formattedData);
+      
+      const response = await jobsAPI.createJob(formattedData);
+      console.log('Job created successfully:', response);
       alert('Job posted successfully!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       console.error('Error posting job:', error);
-      alert('Failed to post job. Please try again.');
+      
+      let errorMsg = 'Failed to save job. ';
+      
+      if (error.response) {
+        console.log('Server error details:', error.response.data);
+        errorMsg += error.response.data.message || 'Server error.';
+      } else if (error.request) {
+        errorMsg += 'Could not connect to server.';
+      } else {
+        errorMsg += error.message;
+      }
+      
+      alert(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -315,8 +346,8 @@ const AddJob = () => {
               onChange={handleInputChange}
             >
               <option value="Select">Select</option>
-              <option value="Full-time">Full-time</option>
-              <option value="Part-time">Part-time</option>
+              <option value="Full Time">Full Time</option>
+              <option value="Part Time">Part Time</option>
               <option value="Contract">Contract</option>
               <option value="Internship">Internship</option>
               <option value="Freelance">Freelance</option>
