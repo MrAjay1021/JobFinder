@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { jobsAPI } from '../services/api';
@@ -147,6 +147,9 @@ const styles = {
     flexWrap: 'wrap',
     alignItems: 'center',
     gap: '10px',
+  },
+  filterDropdownContainer: {
+    position: 'relative',
   },
   filterDropdown: {
     padding: '8px 12px',
@@ -354,6 +357,26 @@ const MainPage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [availableSkills, setAvailableSkills] = useState([
+    'Frontend', 'Backend', 'CSS', 'HTML', 'JavaScript', 'React', 'Node.js', 
+    'Python', 'PHP', 'WordPress', 'UI/UX', 'Design', 'Mobile', 'DevOps'
+  ]);
+  const dropdownRef = useRef(null);
+  
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   
   // Fetch jobs on component mount
   useEffect(() => {
@@ -411,6 +434,17 @@ const MainPage = () => {
     logout();
   };
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleAddSkill = (skill) => {
+    if (!selectedSkills.includes(skill)) {
+      setSelectedSkills([...selectedSkills, skill]);
+    }
+    setIsDropdownOpen(false);
+  };
+
   return (
     <div style={styles.mainContainer}>
       {/* Header */}
@@ -455,9 +489,62 @@ const MainPage = () => {
           </form>
 
           <div style={styles.filterRow}>
-            <div style={styles.filterDropdown}>
-              <span>Skills</span>
-              <span>▼</span>
+            <div style={styles.filterDropdownContainer}>
+              <div 
+                ref={dropdownRef}
+                style={styles.filterDropdown}
+                onClick={toggleDropdown}
+              >
+                <span>Skills</span>
+                <span>▼</span>
+                
+                {isDropdownOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    width: '200px',
+                    backgroundColor: 'white',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                    borderRadius: '5px',
+                    marginTop: '5px',
+                    zIndex: 100,
+                    maxHeight: '250px',
+                    overflowY: 'auto',
+                  }}>
+                    {availableSkills
+                      .filter(skill => !selectedSkills.includes(skill))
+                      .map((skill, index) => (
+                        <div 
+                          key={index} 
+                          style={{
+                            padding: '10px 15px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            color: '#333',
+                            borderBottom: '1px solid #f0f0f0',
+                            hover: { backgroundColor: '#ffebee' }
+                          }}
+                          onClick={() => handleAddSkill(skill)}
+                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ffebee'}
+                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                        >
+                          {skill}
+                        </div>
+                      ))
+                    }
+                    {availableSkills.filter(skill => !selectedSkills.includes(skill)).length === 0 && (
+                      <div style={{
+                        padding: '10px 15px',
+                        fontSize: '14px',
+                        color: '#666'
+                      }}>
+                        No more skills available
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div style={styles.filterTagsContainer}>
