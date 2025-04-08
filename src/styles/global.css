@@ -1,0 +1,102 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  line-height: 1.6;
+  color: #333;
+  background-color: #f7f7f7;
+  font-size: 16px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+input, button, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.errorText {
+  color: #e02424;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Improved focus styles for accessibility */
+:focus {
+  outline: 2px solid #f05252;
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Responsive font sizing */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Printing styles */
+@media print {
+  body {
+    background-color: white;
+    color: black;
+  }
+}
+
+/* High contrast mode for accessibility */
+@media (prefers-contrast: high) {
+  body {
+    background-color: white;
+    color: black;
+  }
+  
+  .submitButton {
+    background-color: black !important;
+    color: white !important;
+    border: 2px solid black !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212;
+    color: #f5f5f5;
+  }
+}
+
+/* Add responsiveness */
+@media (max-width: 768px) {
+  .authContainer {
+    flex-direction: column-reverse;
+  }
+  
+  .formSection, .imageSection {
+    width: 100%;
+  }
+  
+  .formSection {
+    padding: 2rem;
+  }
+  
+  .imageSection {
+    height: 200px;
+  }
+} 

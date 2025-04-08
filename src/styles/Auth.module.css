@@ -1,0 +1,179 @@
+.authContainer {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.formSection {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 5rem;
+  transition: all 0.3s ease;
+}
+
+.imageSection {
+  width: 50%;
+  background-color: #1d253a;
+  background-image: linear-gradient(rgba(29, 37, 58, 0.6), rgba(29, 37, 58, 0.6)), url('../assets/images/auth-background.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.pageTitle {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.subTitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.formInput {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #f05252;
+}
+
+.submitButton {
+  background-color: #f05252;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #e02424;
+}
+
+.submitButton:disabled {
+  background-color: #f5a9a9;
+  cursor: not-allowed;
+}
+
+.altText {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #666;
+}
+
+.altLink {
+  color: #f05252;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.checkbox input {
+  margin-right: 0.5rem;
+}
+
+.imageTitle {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 0 2rem;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .formSection {
+    padding: 0 3rem;
+  }
+  
+  .pageTitle {
+    font-size: 2.2rem;
+  }
+  
+  .imageTitle {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .formSection {
+    padding: 0 2rem;
+  }
+  
+  .pageTitle {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .authContainer {
+    flex-direction: column-reverse;
+  }
+  
+  .formSection, .imageSection {
+    width: 100%;
+  }
+  
+  .formSection {
+    padding: 2rem;
+  }
+  
+  .imageSection {
+    height: 30vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .formSection {
+    padding: 1.5rem;
+  }
+  
+  .pageTitle {
+    font-size: 1.8rem;
+  }
+  
+  .imageTitle {
+    font-size: 1.5rem;
+  }
+  
+  .submitButton {
+    padding: 0.8rem;
+  }
+  
+  .formInput {
+    padding: 0.8rem;
+  }
+} 

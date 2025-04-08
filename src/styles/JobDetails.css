@@ -1,0 +1,249 @@
+.job-details-page {
+  width: 100%;
+  position: relative;
+  min-height: 100vh;
+}
+
+.job-header {
+  width: 1099px;
+  height: 147px;
+  margin: -30px auto 30px;
+  background: #FFFFFF;
+  box-shadow: 0px 4px 23px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  position: relative;
+}
+
+.job-header-title {
+  width: 923px;
+  font-size: 29px;
+  font-weight: 500;
+  line-height: 144.02%;
+  text-align: center;
+  color: #000000;
+}
+
+.job-details-container {
+  width: 1099px;
+  background: #FFFFFF;
+  box-shadow: 0px 2px 35px 1px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  padding: 40px;
+  position: relative;
+}
+
+.job-meta {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 20px;
+}
+
+.job-meta-item {
+  display: flex;
+  align-items: center;
+  font-size: 20.25px;
+  font-weight: 500;
+  line-height: 144.02%;
+  color: #999999;
+}
+
+.job-meta-dot {
+  margin: 0 10px;
+  font-size: 20.25px;
+  font-weight: 500;
+  line-height: 144.02%;
+  color: #999999;
+}
+
+.job-title {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 144.02%;
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+.job-location {
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 144.02%;
+  color: #ED5353;
+  margin-bottom: 40px;
+}
+
+.job-info-section {
+  display: flex;
+  gap: 90px;
+  margin-bottom: 40px;
+}
+
+.job-info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.job-info-label {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 164.5%;
+  color: #999999;
+  margin-bottom: 5px;
+}
+
+.job-info-icon {
+  margin-right: 10px;
+}
+
+.job-info-value {
+  font-size: 20.25px;
+  font-weight: 500;
+  line-height: 144.02%;
+  color: #595959;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 169.52%;
+  color: #000000;
+  margin-bottom: 20px;
+}
+
+.section-content {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 164.5%;
+  color: #595959;
+  margin-bottom: 40px;
+}
+
+.job-skills {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.job-skill {
+  min-width: 100px;
+  height: 39px;
+  background: #FFEEEE;
+  border-radius: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 169.52%;
+  color: #595959;
+}
+
+.edit-job-btn {
+  width: 161px;
+  height: 54px;
+  background: #ED5353;
+  border-radius: 6px;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 144.02%;
+  text-align: center;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 40px;
+  top: 80px;
+  cursor: pointer;
+}
+
+.apply-job-btn {
+  width: 161px;
+  height: 54px;
+  background: #ED5353;
+  border-radius: 6px;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 144.02%;
+  text-align: center;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 40px auto;
+  cursor: pointer;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 1200px) {
+  .job-header, .job-details-container {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .job-header {
+    height: auto;
+    padding: 20px;
+  }
+  
+  .job-header-title {
+    width: 100%;
+    font-size: 24px;
+  }
+  
+  .job-title {
+    font-size: 32px;
+  }
+  
+  .job-details-container {
+    padding: 20px;
+  }
+  
+  .job-info-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .section-content, .section-title {
+    font-size: 18px;
+  }
+  
+  .job-skill {
+    font-size: 16px;
+    height: 30px;
+  }
+  
+  .edit-job-btn {
+    position: static;
+    margin: 20px auto;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .job-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .job-meta-dot {
+    display: none;
+  }
+  
+  .job-title {
+    font-size: 24px;
+  }
+  
+  .job-location {
+    font-size: 16px;
+  }
+  
+  .job-skills {
+    flex-wrap: wrap;
+  }
+} 
