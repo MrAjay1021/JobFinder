@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
+// CSS is now loaded in the index.html file directly from css folder
 
 // Components
 import AddJob from './components/AddJob';
@@ -9,9 +10,9 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import JobDetails from './components/JobDetails';
+import MainPage from './pages/MainPage';
 
 // Placeholder components - will be implemented later
-const Home = () => <div>Home Page</div>;
 const Profile = () => <div>Profile Page</div>;
 const MyApplications = () => <div>My Applications Page</div>;
 
@@ -21,7 +22,7 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<MainPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/jobs" element={<Dashboard />} />
