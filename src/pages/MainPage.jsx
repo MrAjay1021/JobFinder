@@ -353,7 +353,7 @@ const getCompanyLogo = (job) => {
 const MainPage = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSkills, setSelectedSkills] = useState(['Frontend', 'CSS', 'JavaScript']);
+  const [selectedSkills, setSelectedSkills] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -378,10 +378,10 @@ const MainPage = () => {
     };
   }, []);
   
-  // Fetch jobs on component mount
+  // Fetch jobs on component mount and when authentication status changes
   useEffect(() => {
     fetchJobs();
-  }, []);
+  }, [isAuthenticated]);
   
   // Fetch jobs function
   const fetchJobs = async (queryFilters = {}) => {
@@ -435,6 +435,10 @@ const MainPage = () => {
 
   const handleLogout = () => {
     logout();
+    // Clear any filters
+    setSelectedSkills([]);
+    setSearchTerm('');
+    // The jobs will be refetched automatically due to the useEffect dependency on isAuthenticated
   };
 
   const toggleDropdown = () => {
