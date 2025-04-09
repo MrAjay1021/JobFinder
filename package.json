@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "all": "^0.0.0",
     "axios": "^1.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -22,7 +23,10 @@
     ],
     "overrides": [
       {
-        "files": ["**/*.test.js", "**/*.test.jsx"],
+        "files": [
+          "**/*.test.js",
+          "**/*.test.jsx"
+        ],
         "env": {
           "jest": true
         }
@@ -44,4 +48,4 @@
   "devDependencies": {
     "eslint-plugin-jest": "^27.2.1"
   }
-} 
+}
