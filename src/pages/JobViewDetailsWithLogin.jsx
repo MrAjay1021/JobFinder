@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { jobsAPI } from '../services/api';
 import indiaFlag from '../assets/images/India.png';
-import userloggedin from '../assets/images/userloggedin.png';
+import boyAvatar from '../assets/images/boy.svg';
 import googleLogo from '../assets/images/media.png'; // Using media.png as Google logo
 
 // Styles for the component
@@ -181,11 +182,38 @@ const styles = {
   }
 };
 
+// Helper function to format date
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return '1w ago'; // Fallback
+  
+  const now = new Date();
+  const past = new Date(dateString);
+  
+  // Handle invalid date
+  if (isNaN(past.getTime())) return '1w ago';
+  
+  const seconds = Math.floor((now - past) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  
+  if (months > 0) return `${months}mo ago`;
+  if (weeks > 0) return `${weeks}w ago`;
+  if (days > 0) return `${days}d ago`;
+  if (hours > 0) return `${hours}h ago`;
+  if (minutes > 0) return `${minutes}m ago`;
+  return 'Just now';
+};
+
 const JobViewDetailsWithLogin = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [jobData, setJobData] = useState(null);
+  const [error, setError] = useState(null);
   
   // Redirect if not authenticated
   useEffect(() => {
@@ -194,7 +222,33 @@ const JobViewDetailsWithLogin = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Mock data for WordPress Developer
+  // Fetch job data from API
+  useEffect(() => {
+    const fetchJobData = async () => {
+      try {
+        // Attempt to get the job from the API
+        const response = await jobsAPI.getJobById(id);
+        setJobData(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching job data:', err);
+        setError('Failed to load job details');
+        
+        // Fallback to mock data if API fails
+        if (id.toLowerCase().includes('wordpress')) {
+          setJobData(wordpressJobData);
+        } else {
+          setJobData(frontendJobData);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchJobData();
+  }, [id]);
+
+  // Mock data as fallback
   const wordpressJobData = {
     id: "wordpress-job",
     title: "WordPress Development",
@@ -209,7 +263,6 @@ const JobViewDetailsWithLogin = () => {
     additionalInfo: "Stipend structure: This is a performance-based internship. In addition to the minimum-assured stipend, you will also be paid a performance-linked incentive (₹ 2500 per design)."
   };
 
-  // Mock data for Frontend Developer
   const frontendJobData = {
     id: "frontend-job",
     title: "Frontend Developer",
@@ -224,21 +277,12 @@ const JobViewDetailsWithLogin = () => {
     additionalInfo: "This is a remote position with occasional visits to our Mumbai office for team meetings. We offer flexible working hours and opportunities for professional growth."
   };
 
-  // Determine which job data to use based on ID parameter
-  // For simplicity, we're just checking if "wordpress" is in the ID
-  const jobData = id.toLowerCase().includes('wordpress') ? wordpressJobData : frontendJobData;
-
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '40px' }}>Loading job details...</div>;
+  }
+
+  if (error && !jobData) {
+    return <div style={{ textAlign: 'center', padding: '40px', color: 'red' }}>{error}</div>;
   }
 
   const handleLogout = () => {
@@ -246,25 +290,13 @@ const JobViewDetailsWithLogin = () => {
     navigate('/login');
   };
 
-  // Example responsibilities based on job type
-  const wordpressResponsibilities = [
-    "Work on the development of theme customization, liquid programming languages and corresponding apps",
-    "Implement system integrations that are crucial to our success",
-    "Contribute to the development of HTML/CSS/JavaScript and standard web technologies integral to building seamless multi-channel experiences",
-    "Work on speed optimization and making a mobile-friendly website"
-  ];
+  // If no job data, show error
+  if (!jobData) {
+    return <div style={{ textAlign: 'center', padding: '40px' }}>Job not found</div>;
+  }
 
-  const frontendResponsibilities = [
-    "Develop responsive web interfaces using React, CSS and modern JavaScript",
-    "Collaborate with designers to implement pixel-perfect UI components",
-    "Optimize application performance and ensure cross-browser compatibility",
-    "Write clean, well-documented code following best practices"
-  ];
-
-  // Select responsibilities based on job title
-  const responsibilities = jobData.title.toLowerCase().includes('wordpress') 
-    ? wordpressResponsibilities 
-    : frontendResponsibilities;
+  // Ensure we have a valid monthlySalary value
+  const monthlySalary = jobData.monthlySalary || 0;
 
   return (
     <div>
@@ -276,7 +308,7 @@ const JobViewDetailsWithLogin = () => {
             <button style={styles.logoutButton} onClick={handleLogout}>Logout</button>
             <div style={styles.userInfo}>
               <span>Hello! {user?.name || 'Recruiter'}</span>
-              <img src={userloggedin} alt="User" style={styles.userAvatar} />
+              <img src={boyAvatar} alt="User" style={styles.userAvatar} />
             </div>
           </div>
         </div>
@@ -293,14 +325,20 @@ const JobViewDetailsWithLogin = () => {
         {/* Job Details Card */}
         <div style={styles.jobCard}>
           <div style={styles.jobTypeRow}>
-            <span>1w ago</span>
+            <span>{formatTimeAgo(jobData.createdAt)}</span>
             <span style={{ margin: '0 8px' }}>·</span>
             <span>{jobData.jobType}</span>
           </div>
 
           <div style={styles.headerWithButton}>
             <h2 style={styles.jobTitle}>{jobData.title}</h2>
-            <Link to={`/edit-job/${jobData.id}`} style={styles.editButton}>Edit job</Link>
+            <Link 
+              to={`/edit-job/${jobData._id || jobData.id}`} 
+              state={{ jobData: jobData }}
+              style={styles.editButton}
+            >
+              Edit job
+            </Link>
           </div>
           
           <div style={styles.locationBadge}>
@@ -310,7 +348,7 @@ const JobViewDetailsWithLogin = () => {
 
           <div style={styles.jobDetail}>
             <span style={styles.detailLabel}>Stipend</span>
-            <span style={styles.detailValue}>Rs {jobData.monthlySalary.toLocaleString()}/month</span>
+            <span style={styles.detailValue}>Rs {monthlySalary.toLocaleString()}/month</span>
           </div>
 
           <div style={styles.jobDetail}>
@@ -330,15 +368,17 @@ const JobViewDetailsWithLogin = () => {
             <p style={styles.companyInfo}>{jobData.description}</p>
           </div>
 
-          {/* Selected Intern's Responsibilities */}
-          <div style={styles.infoSection}>
-            <h3 style={styles.sectionHeading}>Selected intern's day-to-day responsibilities include:</h3>
-            <ul style={styles.descriptionList}>
-              {responsibilities.map((responsibility, index) => (
-                <li key={index} style={styles.listItem}>{responsibility}</li>
-              ))}
-            </ul>
-          </div>
+          {/* Selected Intern's Responsibilities - Only show if explicitly provided */}
+          {jobData.responsibilities && jobData.responsibilities.length > 0 && (
+            <div style={styles.infoSection}>
+              <h3 style={styles.sectionHeading}>Selected intern's day-to-day responsibilities include:</h3>
+              <ul style={styles.descriptionList}>
+                {jobData.responsibilities.map((responsibility, index) => (
+                  <li key={index} style={styles.listItem}>{responsibility}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Skills Required Section */}
           <div style={styles.infoSection}>
@@ -351,10 +391,12 @@ const JobViewDetailsWithLogin = () => {
           </div>
 
           {/* Additional Information */}
-          <div style={styles.infoSection}>
-            <h3 style={styles.sectionHeading}>Additional Information</h3>
-            <p style={styles.infoText}>{jobData.additionalInfo}</p>
-          </div>
+          {jobData.additionalInfo && (
+            <div style={styles.infoSection}>
+              <h3 style={styles.sectionHeading}>Additional Information</h3>
+              <p style={styles.infoText}>{jobData.additionalInfo}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

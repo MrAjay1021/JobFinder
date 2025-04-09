@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { jobsAPI } from '../services/api';
 import indiaFlag from '../assets/images/India.png';
 
 // Styles for the component
@@ -170,12 +171,65 @@ const styles = {
   }
 };
 
+// Helper function to format date
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return '1w ago'; // Fallback
+  
+  const now = new Date();
+  const past = new Date(dateString);
+  
+  // Handle invalid date
+  if (isNaN(past.getTime())) return '1w ago';
+  
+  const seconds = Math.floor((now - past) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  
+  if (months > 0) return `${months}mo ago`;
+  if (weeks > 0) return `${weeks}w ago`;
+  if (days > 0) return `${days}d ago`;
+  if (hours > 0) return `${hours}h ago`;
+  if (minutes > 0) return `${minutes}m ago`;
+  return 'Just now';
+};
+
 const JobViewDetailsWithoutLogin = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [jobData, setJobData] = useState(null);
+  const [error, setError] = useState(null);
+
+  // Fetch job data from API
+  useEffect(() => {
+    const fetchJobData = async () => {
+      try {
+        // Attempt to get the job from the API
+        const response = await jobsAPI.getJobById(id);
+        setJobData(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching job data:', err);
+        setError('Failed to load job details');
+        
+        // Fallback to mock data if API fails
+        if (id.toLowerCase().includes('wordpress')) {
+          setJobData(wordpressJobData);
+        } else {
+          setJobData(frontendJobData);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchJobData();
+  }, [id]);
   
-  // Mock data for WordPress Developer
+  // Mock data as fallback
   const wordpressJobData = {
     id: "wordpress-job",
     title: "WordPress Development",
@@ -189,7 +243,6 @@ const JobViewDetailsWithoutLogin = () => {
     additionalInfo: "Stipend structure: This is a performance-based internship. In addition to the minimum-assured stipend, you will also be paid a performance-linked incentive (₹ 2500 per design)."
   };
 
-  // Mock data for Frontend Developer
   const frontendJobData = {
     id: "frontend-job",
     title: "Frontend Developer",
@@ -203,42 +256,21 @@ const JobViewDetailsWithoutLogin = () => {
     additionalInfo: "This is a remote position with occasional visits to our Mumbai office for team meetings. We offer flexible working hours and opportunities for professional growth."
   };
 
-  // Determine which job data to use based on ID parameter
-  // For simplicity, we're just checking if "wordpress" is in the ID
-  const jobData = id.toLowerCase().includes('wordpress') ? wordpressJobData : frontendJobData;
-
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '40px' }}>Loading job details...</div>;
   }
 
-  // Example responsibilities based on job type
-  const wordpressResponsibilities = [
-    "Work on the development of theme customization, liquid programming languages and corresponding apps",
-    "Implement system integrations that are crucial to our success",
-    "Contribute to the development of HTML/CSS/JavaScript and standard web technologies integral to building seamless multi-channel experiences",
-    "Work on speed optimization and making a mobile-friendly website"
-  ];
+  if (error && !jobData) {
+    return <div style={{ textAlign: 'center', padding: '40px', color: 'red' }}>{error}</div>;
+  }
 
-  const frontendResponsibilities = [
-    "Develop responsive web interfaces using React, CSS and modern JavaScript",
-    "Collaborate with designers to implement pixel-perfect UI components",
-    "Optimize application performance and ensure cross-browser compatibility",
-    "Write clean, well-documented code following best practices"
-  ];
+  // If no job data, show error
+  if (!jobData) {
+    return <div style={{ textAlign: 'center', padding: '40px' }}>Job not found</div>;
+  }
 
-  // Select responsibilities based on job title
-  const responsibilities = jobData.title.toLowerCase().includes('wordpress') 
-    ? wordpressResponsibilities 
-    : frontendResponsibilities;
+  // Ensure we have a valid monthlySalary value
+  const monthlySalary = jobData.monthlySalary || 0;
 
   return (
     <div>
@@ -264,7 +296,7 @@ const JobViewDetailsWithoutLogin = () => {
         {/* Job Details Card */}
         <div style={styles.jobCard}>
           <div style={styles.jobTypeRow}>
-            <span>1w ago</span>
+            <span>{formatTimeAgo(jobData.createdAt)}</span>
             <span style={{ margin: '0 8px' }}>·</span>
             <span>{jobData.jobType}</span>
           </div>
@@ -278,7 +310,7 @@ const JobViewDetailsWithoutLogin = () => {
 
           <div style={styles.jobDetail}>
             <span style={styles.detailLabel}>Stipend</span>
-            <span style={styles.detailValue}>Rs {jobData.monthlySalary.toLocaleString()}/month</span>
+            <span style={styles.detailValue}>Rs {monthlySalary.toLocaleString()}/month</span>
           </div>
 
           <div style={styles.jobDetail}>
@@ -298,15 +330,17 @@ const JobViewDetailsWithoutLogin = () => {
             <p style={styles.companyInfo}>{jobData.description}</p>
           </div>
 
-          {/* Selected Intern's Responsibilities */}
-          <div style={styles.infoSection}>
-            <h3 style={styles.sectionHeading}>Selected intern's day-to-day responsibilities include:</h3>
-            <ul style={styles.descriptionList}>
-              {responsibilities.map((responsibility, index) => (
-                <li key={index} style={styles.listItem}>{responsibility}</li>
-              ))}
-            </ul>
-          </div>
+          {/* Selected Intern's Responsibilities - Only show if explicitly provided */}
+          {jobData.responsibilities && jobData.responsibilities.length > 0 && (
+            <div style={styles.infoSection}>
+              <h3 style={styles.sectionHeading}>Selected intern's day-to-day responsibilities include:</h3>
+              <ul style={styles.descriptionList}>
+                {jobData.responsibilities.map((responsibility, index) => (
+                  <li key={index} style={styles.listItem}>{responsibility}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Skills Required Section */}
           <div style={styles.infoSection}>
@@ -319,13 +353,19 @@ const JobViewDetailsWithoutLogin = () => {
           </div>
 
           {/* Additional Information */}
-          <div style={styles.infoSection}>
-            <h3 style={styles.sectionHeading}>Additional Information</h3>
-            <p style={styles.infoText}>{jobData.additionalInfo}</p>
-          </div>
+          {jobData.additionalInfo && (
+            <div style={styles.infoSection}>
+              <h3 style={styles.sectionHeading}>Additional Information</h3>
+              <p style={styles.infoText}>{jobData.additionalInfo}</p>
+            </div>
+          )}
 
           {/* Login to Apply Button */}
-          <Link to="/login" style={styles.loginToApply}>
+          <Link 
+            to="/login" 
+            state={{ returnTo: `/view-job-logged-in/${jobData._id || jobData.id}` }}
+            style={styles.loginToApply}
+          >
             Login to Apply
           </Link>
         </div>

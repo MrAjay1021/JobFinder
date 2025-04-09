@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import { jobsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Header from './Header';
+import wallpaperDog from '../assets/images/WallpaperDog.png';
 
 // Styles object for inline styling
 const styles = {
@@ -29,28 +30,30 @@ const styles = {
   formContainer: {
     display: 'flex',
     flex: 1,
+    flexDirection: window.innerWidth < 768 ? 'column' : 'row',
   },
   leftSection: {
     flex: '1',
-    padding: '40px',
+    padding: window.innerWidth < 768 ? '20px' : '40px',
     backgroundColor: 'white',
   },
   rightSection: {
     flex: '1',
-    padding: '40px',
+    padding: window.innerWidth < 768 ? '20px' : '40px',
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: 'black',
     color: 'white',
     position: 'relative',
+    minHeight: window.innerWidth < 768 ? '300px' : '500px',
   },
   heading: {
-    fontSize: '28px',
+    fontSize: window.innerWidth < 768 ? '24px' : '28px',
     fontWeight: 'bold',
-    marginBottom: '30px',
+    marginBottom: window.innerWidth < 768 ? '20px' : '30px',
   },
   formGroup: {
-    marginBottom: '20px',
+    marginBottom: window.innerWidth < 768 ? '15px' : '20px',
   },
   label: {
     display: 'block',
@@ -59,17 +62,17 @@ const styles = {
   },
   input: {
     width: '100%',
-    padding: '12px',
+    padding: window.innerWidth < 768 ? '10px' : '12px',
     border: '1px solid #ddd',
     borderRadius: '4px',
-    fontSize: '16px',
+    fontSize: window.innerWidth < 768 ? '14px' : '16px',
   },
   select: {
     width: '100%',
-    padding: '12px',
+    padding: window.innerWidth < 768 ? '10px' : '12px',
     border: '1px solid #ddd',
     borderRadius: '4px',
-    fontSize: '16px',
+    fontSize: window.innerWidth < 768 ? '14px' : '16px',
     appearance: 'none',
     backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")',
     backgroundRepeat: 'no-repeat',
@@ -78,10 +81,10 @@ const styles = {
   },
   textarea: {
     width: '100%',
-    padding: '12px',
+    padding: window.innerWidth < 768 ? '10px' : '12px',
     border: '1px solid #ddd',
     borderRadius: '4px',
-    fontSize: '16px',
+    fontSize: window.innerWidth < 768 ? '14px' : '16px',
     minHeight: '100px',
     resize: 'vertical',
   },
@@ -117,6 +120,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     marginTop: '30px',
+    flexDirection: window.innerWidth < 480 ? 'column' : 'row',
+    gap: window.innerWidth < 480 ? '10px' : '0',
   },
   cancelButton: {
     padding: '10px 20px',
@@ -124,7 +129,7 @@ const styles = {
     border: '1px solid #ddd',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '16px',
+    fontSize: window.innerWidth < 768 ? '14px' : '16px',
   },
   submitButton: {
     padding: '10px 20px',
@@ -133,15 +138,27 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '16px',
+    fontSize: window.innerWidth < 768 ? '14px' : '16px',
   },
   rightHeading: {
-    fontSize: '28px',
-    marginBottom: '40px',
+    fontSize: window.innerWidth < 768 ? '24px' : '28px',
+    marginBottom: window.innerWidth < 768 ? '20px' : '40px',
   },
   illustration: {
     marginTop: 'auto',
     alignSelf: 'center',
+    width: '100%',
+    maxWidth: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 'calc(100% - 80px)',
+  },
+  wallpaperImage: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'contain',
+    borderRadius: '8px',
   },
   errorText: {
     color: '#f05252',
@@ -153,10 +170,12 @@ const styles = {
 const AddJob = () => {
   const navigate = useNavigate();
   const { id } = useParams(); // Get job ID from URL
+  const location = useLocation(); // Get location object with state
   const { isAuthenticated, user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentSkill, setCurrentSkill] = useState('');
   const [formErrors, setFormErrors] = useState({});
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   const [jobData, setJobData] = useState({
     title: '',
@@ -175,17 +194,53 @@ const AddJob = () => {
   // Fetch job details if editing
   useEffect(() => {
     if (id) {
-      const fetchJobDetails = async () => {
-        try {
-          const response = await jobsAPI.getJobById(id);
-          setJobData(response.data);
-        } catch (error) {
-          console.error('Failed to fetch job details:', error);
-        }
-      };
-      fetchJobDetails();
+      // First check if job data was passed via location state
+      if (location.state && location.state.jobData) {
+        const stateJobData = location.state.jobData;
+        
+        // Map the job data to match the form structure
+        setJobData({
+          title: stateJobData.title || '',
+          companyName: stateJobData.companyName || '',
+          companyLogoUrl: stateJobData.companyLogo || stateJobData.logoUrl || '',
+          location: stateJobData.location || '',
+          jobType: stateJobData.jobType || 'Select',
+          remoteOption: stateJobData.isRemote ? 'Remote' : 'Office',
+          monthlySalary: stateJobData.monthlySalary?.toString() || '',
+          description: stateJobData.description || '',
+          aboutCompany: stateJobData.aboutCompany || '',
+          skillsRequired: stateJobData.skillsRequired || [],
+          additionalInfo: stateJobData.additionalInfo || ''
+        });
+      } else {
+        // If not passed via state, fetch from API
+        const fetchJobDetails = async () => {
+          try {
+            const response = await jobsAPI.getJobById(id);
+            if (response.data) {
+              const apiJobData = response.data;
+              setJobData({
+                title: apiJobData.title || '',
+                companyName: apiJobData.companyName || '',
+                companyLogoUrl: apiJobData.logoUrl || apiJobData.companyLogoUrl || '',
+                location: apiJobData.location || '',
+                jobType: apiJobData.jobType || 'Select',
+                remoteOption: apiJobData.remoteOffice || (apiJobData.isRemote ? 'Remote' : 'Office'),
+                monthlySalary: apiJobData.monthlySalary?.toString() || '',
+                description: apiJobData.description || '',
+                aboutCompany: apiJobData.aboutCompany || '',
+                skillsRequired: apiJobData.skillsRequired || [],
+                additionalInfo: apiJobData.additionalInfo || ''
+              });
+            }
+          } catch (error) {
+            console.error('Failed to fetch job details:', error);
+          }
+        };
+        fetchJobDetails();
+      }
     }
-  }, [id]);
+  }, [id, location]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -193,6 +248,51 @@ const AddJob = () => {
       navigate('/login');
     }
   }, [isAuthenticated, navigate]);
+
+  // Add resize listener for responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Dynamically update styles based on window width
+  const getResponsiveStyles = () => {
+    return {
+      ...styles,
+      formContainer: {
+        ...styles.formContainer,
+        flexDirection: windowWidth < 768 ? 'column' : 'row',
+      },
+      leftSection: {
+        ...styles.leftSection,
+        padding: windowWidth < 768 ? '20px' : '40px',
+      },
+      rightSection: {
+        ...styles.rightSection, 
+        padding: windowWidth < 768 ? '20px' : '40px',
+        minHeight: windowWidth < 768 ? '300px' : '500px',
+      },
+      heading: {
+        ...styles.heading,
+        fontSize: windowWidth < 768 ? '24px' : '28px',
+        marginBottom: windowWidth < 768 ? '20px' : '30px',
+      },
+      illustration: {
+        ...styles.illustration,
+        height: windowWidth < 768 ? '250px' : 'calc(100% - 80px)',
+      },
+      wallpaperImage: {
+        ...styles.wallpaperImage,
+        maxHeight: windowWidth < 768 ? '250px' : '100%',
+      }
+    };
+  };
+  
+  const responsiveStyles = getResponsiveStyles();
 
   const validateForm = () => {
     const errors = {};
@@ -273,6 +373,8 @@ const AddJob = () => {
         // Ensure skills are an array
         skillsRequired: Array.isArray(jobData.skillsRequired) ? 
                        jobData.skillsRequired.slice(0, 10) : [],
+        // Include additional info field
+        additionalInfo: jobData.additionalInfo || ''
       };
       
       // Only add non-essential fields if they have values
@@ -491,10 +593,13 @@ const AddJob = () => {
                   {jobData.skillsRequired.map((skill, index) => (
                     <div key={index} style={styles.skillTag}>
                       {skill}
-                      <span 
-                        style={styles.skillClose} 
+                      <button
+                        type="button"
                         onClick={() => handleRemoveSkill(skill)}
-                      >×</span>
+                        style={styles.skillClose}
+                      >
+                        ×
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -517,8 +622,8 @@ const AddJob = () => {
             <div style={styles.buttonRow}>
               <button 
                 type="button" 
+                onClick={() => navigate(-1)} 
                 style={styles.cancelButton}
-                onClick={() => navigate('/dashboard')}
               >
                 Cancel
               </button>
@@ -527,26 +632,21 @@ const AddJob = () => {
                 style={styles.submitButton}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Saving...' : id ? 'Update Job' : '+ Add Job'}
+                {id ? (isSubmitting ? 'Updating...' : 'Update Job') : (isSubmitting ? 'Submitting...' : 'Add Job')}
               </button>
             </div>
           </form>
         </div>
         
-        {/* Right Section - Black background with illustration */}
-        <div style={styles.rightSection}>
-          <h2 style={styles.rightHeading}>Recruiter add job details here</h2>
-          
-          <div style={styles.illustration}>
-            {/* This is where the colorful code elements would go */}
-            <svg width="300" height="300" viewBox="0 0 400 400">
-              <circle cx="200" cy="200" r="50" fill="#FF6B6B" />
-              <rect x="100" y="100" width="80" height="80" fill="#48CFAD" />
-              <polygon points="300,100 350,200 300,300" fill="#FFCE54" />
-              <path d="M50,250 C50,150 150,150 150,250" stroke="#AC92EC" strokeWidth="8" fill="none" />
-              <circle cx="100" cy="300" r="30" fill="#FC6E51" />
-              <circle cx="300" cy="150" r="20" fill="#4FC1E9" />
-            </svg>
+        {/* Right Section - Illustration */}
+        <div style={responsiveStyles.rightSection}>
+          <h2 style={responsiveStyles.rightHeading}>Recruiter add job details here</h2>
+          <div style={responsiveStyles.illustration}>
+            <img 
+              src={wallpaperDog} 
+              alt="Job Illustration" 
+              style={responsiveStyles.wallpaperImage}
+            />
           </div>
         </div>
       </div>

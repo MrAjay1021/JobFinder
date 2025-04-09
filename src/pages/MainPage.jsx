@@ -8,7 +8,7 @@ import humancloudLogo from '../assets/images/humancloud.png';
 import mediaLogo from '../assets/images/media.png';
 import equinixLogo from '../assets/images/equinix.png';
 import indiaFlag from '../assets/images/India.png';
-import userloggedin from '../assets/images/userloggedin.png';
+import boyAvatar from '../assets/images/boy.svg';
 
 // Directly implement the CSS styles to match the screenshot
 const styles = {
@@ -457,7 +457,7 @@ const MainPage = () => {
               <button style={styles.logoutButton} onClick={handleLogout}>Logout</button>
               <div style={styles.userInfo}>
                 <span>Hello! {user?.name || 'Recruiter'}</span>
-                <img src={userloggedin} alt="User" style={styles.userAvatar} />
+                <img src={boyAvatar} alt="User" style={styles.userAvatar} />
               </div>
             </div>
           ) : (
