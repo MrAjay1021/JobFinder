@@ -187,6 +187,7 @@ const AddJob = () => {
     jobType: 'Select',
     remoteOption: 'Select',
     monthlySalary: '',
+    duration: '6 Months',
     description: '',
     aboutCompany: '',
     skillsRequired: [],
@@ -209,6 +210,7 @@ const AddJob = () => {
           jobType: stateJobData.jobType || 'Select',
           remoteOption: stateJobData.isRemote ? 'Remote' : 'Office',
           monthlySalary: stateJobData.monthlySalary?.toString() || '',
+          duration: stateJobData.duration || '6 Months',
           description: stateJobData.description || '',
           aboutCompany: stateJobData.aboutCompany || '',
           skillsRequired: stateJobData.skillsRequired || [],
@@ -229,6 +231,7 @@ const AddJob = () => {
                 jobType: apiJobData.jobType || 'Select',
                 remoteOption: apiJobData.remoteOffice || (apiJobData.isRemote ? 'Remote' : 'Office'),
                 monthlySalary: apiJobData.monthlySalary?.toString() || '',
+                duration: apiJobData.duration || '6 Months',
                 description: apiJobData.description || '',
                 aboutCompany: apiJobData.aboutCompany || '',
                 skillsRequired: apiJobData.skillsRequired || [],
@@ -376,7 +379,8 @@ const AddJob = () => {
         skillsRequired: Array.isArray(jobData.skillsRequired) ? 
                        jobData.skillsRequired.slice(0, 10) : [],
         // Include additional info field
-        additionalInfo: jobData.additionalInfo || ''
+        additionalInfo: jobData.additionalInfo || '',
+        duration: jobData.duration
       };
       
       // Only add non-essential fields if they have values
@@ -619,6 +623,29 @@ const AddJob = () => {
                 onChange={handleInputChange}
                 placeholder="Enter the additional information"
               />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label} htmlFor="duration">Duration</label>
+              <select
+                style={styles.select}
+                id="duration"
+                name="duration"
+                value={jobData.duration}
+                onChange={handleInputChange}
+              >
+                <option value="6 Months">6 Months</option>
+                <option value="1 Year">1 Year</option>
+                <option value="2 Years">2 Years</option>
+                <option value="3 Years">3 Years</option>
+                <option value="4 Years">4 Years</option>
+                <option value="5 Years">5 Years</option>
+                <option value="6 Years">6 Years</option>
+                <option value="7 Years">7 Years</option>
+                <option value="8 Years">8 Years</option>
+                <option value="9 Years">9 Years</option>
+                <option value="10 Years">10 Years</option>
+              </select>
             </div>
             
             <div style={styles.buttonRow}>

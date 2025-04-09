@@ -354,7 +354,7 @@ const JobViewDetailsWithLogin = () => {
 
           <div style={styles.jobDetail}>
             <span style={styles.detailLabel}>Duration</span>
-            <span style={styles.detailValue}>6 Months</span>
+            <span style={styles.detailValue}>{jobData.duration || '6 Months'}</span>
           </div>
 
           {/* About Company Section */}
