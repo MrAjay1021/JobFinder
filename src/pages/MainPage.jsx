@@ -10,8 +10,8 @@ import equinixLogo from '../assets/images/equinix.png';
 import indiaFlag from '../assets/images/India.png';
 import boyAvatar from '../assets/images/boy.svg';
 
-// Directly implement the CSS styles to match the screenshot
-const styles = {
+// Base styles object
+const baseStyles = {
   mainContainer: {
     display: 'flex', 
     flexDirection: 'column',
@@ -358,11 +358,24 @@ const MainPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [availableSkills, setAvailableSkills] = useState([
     'Frontend', 'Backend', 'CSS', 'HTML', 'JavaScript', 'React', 'Node.js', 
     'Python', 'PHP', 'WordPress', 'UI/UX', 'Design', 'Mobile', 'DevOps'
   ]);
   const dropdownRef = useRef(null);
+  
+  // Track window width for responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -462,6 +475,175 @@ const MainPage = () => {
     }
     setIsDropdownOpen(false);
   };
+
+  // Apply responsive styles based on window width
+  const styles = { ...baseStyles };
+
+  // Tablet and below (992px and below)
+  if (windowWidth <= 992) {
+    styles.headerContent = {
+      ...styles.headerContent,
+      width: '95%',
+    };
+    styles.content = {
+      ...styles.content,
+      width: '95%',
+    };
+    styles.filterRow = {
+      ...styles.filterRow,
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+    };
+    styles.buttonContainer = {
+      ...styles.buttonContainer,
+      marginLeft: '0',
+      marginTop: '10px',
+      width: '100%',
+      justifyContent: 'space-between',
+    };
+    styles.filterDropdownContainer = {
+      ...styles.filterDropdownContainer,
+      width: '100%',
+    };
+    styles.filterDropdown = {
+      ...styles.filterDropdown,
+      width: '100%',
+      justifyContent: 'space-between',
+    };
+    styles.filterTagsContainer = {
+      ...styles.filterTagsContainer,
+      width: '100%',
+      marginTop: '10px',
+    };
+  }
+
+  // Mobile (768px and below)
+  if (windowWidth <= 768) {
+    styles.header = {
+      ...styles.header,
+      padding: '10px 0',
+    };
+    styles.headerLogo = {
+      ...styles.headerLogo,
+      fontSize: '20px',
+    };
+    styles.loginButton = {
+      ...styles.loginButton,
+      padding: '6px 15px',
+      fontSize: '12px',
+    };
+    styles.registerButton = {
+      ...styles.registerButton,
+      padding: '6px 15px',
+      fontSize: '12px',
+    };
+    styles.logoutButton = {
+      ...styles.logoutButton,
+      padding: '6px 15px',
+      fontSize: '12px',
+    };
+    styles.userProfile = {
+      ...styles.userProfile,
+      gap: '5px',
+    };
+    styles.searchContainer = {
+      ...styles.searchContainer,
+      padding: '15px',
+    };
+    styles.searchInput = {
+      ...styles.searchInput,
+      padding: '10px 35px',
+      fontSize: '13px',
+    };
+    styles.addJobButton = {
+      ...styles.addJobButton,
+      padding: '6px 15px',
+      fontSize: '12px',
+    };
+    styles.applyButton = {
+      ...styles.applyButton,
+      padding: '6px 15px',
+      fontSize: '12px',
+    };
+    styles.clearButton = {
+      ...styles.clearButton,
+      padding: '6px 15px',
+      fontSize: '12px',
+    };
+  }
+
+  // Small Mobile (576px and below)
+  if (windowWidth <= 576) {
+    styles.headerContent = {
+      ...styles.headerContent,
+      flexDirection: 'column',
+      gap: '10px',
+    };
+    styles.userProfile = {
+      ...styles.userProfile,
+      width: '100%',
+      justifyContent: 'space-between',
+    };
+    styles.authButtons = {
+      ...styles.authButtons,
+      width: '100%',
+      justifyContent: 'space-between',
+    };
+    styles.buttonContainer = {
+      ...styles.buttonContainer,
+      flexDirection: 'column',
+      gap: '10px',
+    };
+    styles.applyButton = {
+      ...styles.applyButton,
+      width: '100%',
+    };
+    styles.clearButton = {
+      ...styles.clearButton,
+      width: '100%',
+    };
+    styles.addJobButton = {
+      ...styles.addJobButton,
+      width: '100%',
+    };
+    // Transform job cards for mobile view
+    styles.jobCard = {
+      ...styles.jobCard,
+      padding: '15px',
+    };
+    styles.jobTitle = {
+      ...styles.jobTitle,
+      fontSize: '16px',
+    };
+    styles.jobDetails = {
+      ...styles.jobDetails,
+      flexWrap: 'wrap',
+      gap: '5px',
+    };
+    styles.jobDetail = {
+      ...styles.jobDetail,
+      fontSize: '13px',
+    };
+    styles.skillTags = {
+      ...styles.skillTags,
+      flexWrap: 'wrap',
+    };
+    styles.skillTag = {
+      ...styles.skillTag,
+      fontSize: '11px',
+      padding: '3px 8px',
+    };
+    styles.cardFooter = {
+      ...styles.cardFooter,
+      flexDirection: 'column',
+      gap: '8px',
+    };
+    styles.viewDetailsButton = {
+      ...styles.viewDetailsButton,
+      width: '100%',
+      textAlign: 'center',
+    };
+  }
 
   return (
     <div style={styles.mainContainer}>
