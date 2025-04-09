@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import authBackground from '../assets/images/auth-background.jpg';
 
-const styles = {
+const baseStyles = {
   container: {
     backgroundColor: '#ffffff',
     width: '100%',
@@ -135,21 +135,6 @@ const styles = {
   checkmark: {
     color: 'white',
     fontSize: '14px',
-  },
-  // Media queries would need to be handled with JavaScript in inline styles
-  '@media (max-width: 1050px)': {
-    container: {
-      flexDirection: 'column',
-    },
-    formColumn: {
-      width: '100%',
-      paddingLeft: '20px',
-      paddingRight: '20px',
-    },
-    imageColumn: {
-      width: '100%',
-      height: '300px',
-    },
   }
 };
 
@@ -162,9 +147,22 @@ const Register = () => {
     agreeToTerms: false
   });
   const [error, setError] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { register } = useAuth();
   const { successToast, errorToast } = useToast();
   const navigate = useNavigate();
+
+  // Handle window resize for responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -192,31 +190,142 @@ const Register = () => {
     }
   };
 
-  // Apply responsive styles based on window width
-  const isMobile = window.innerWidth <= 1050;
-  const containerStyle = {
-    ...styles.container,
-    ...(isMobile ? { flexDirection: 'column' } : {})
-  };
-  
-  const formColumnStyle = {
-    ...styles.formColumn,
-    ...(isMobile ? { width: '100%', paddingLeft: '20px', paddingRight: '20px' } : {})
-  };
-  
-  const imageColumnStyle = {
-    ...styles.imageColumn,
-    ...(isMobile ? { width: '100%', height: '300px' } : {})
-  };
+  // Responsive styles
+  const styles = { ...baseStyles };
 
-  const checkboxStyle = {
-    ...styles.customCheckbox,
-    ...(formData.agreeToTerms ? styles.checkedCheckbox : {})
-  };
+  // Large Desktop and Default (1200px+)
+  // No changes needed
+
+  // Desktop (992px - 1199px)
+  if (windowWidth <= 1200) {
+    styles.formColumn = {
+      ...styles.formColumn,
+      width: '50%',
+      padding: '0 30px',
+    };
+    styles.imageColumn = {
+      ...styles.imageColumn,
+      width: '50%',
+    };
+    styles.title = {
+      ...styles.title,
+      fontSize: '28px',
+    };
+    styles.subtitle = {
+      ...styles.subtitle,
+      fontSize: '16px',
+    };
+  }
+
+  // Tablet (768px - 991px)
+  if (windowWidth <= 992) {
+    styles.container = {
+      ...styles.container,
+      flexDirection: 'column-reverse',
+    };
+    styles.formColumn = {
+      ...styles.formColumn,
+      width: '100%',
+      marginTop: '40px',
+      padding: '0 30px',
+    };
+    styles.imageColumn = {
+      ...styles.imageColumn,
+      width: '100%',
+      height: '300px',
+    };
+    styles.imageText = {
+      ...styles.imageText,
+      fontSize: '28px',
+    };
+  }
+
+  // Mobile (576px - 767px)
+  if (windowWidth <= 768) {
+    styles.formColumn = {
+      ...styles.formColumn,
+      padding: '0 20px',
+      marginTop: '30px',
+    };
+    styles.title = {
+      ...styles.title,
+      fontSize: '24px',
+    };
+    styles.subtitle = {
+      ...styles.subtitle,
+      fontSize: '15px',
+      marginBottom: '20px',
+    };
+    styles.input = {
+      ...styles.input,
+      padding: '12px 20px',
+      fontSize: '15px',
+      height: '45px',
+    };
+    styles.submitButton = {
+      ...styles.submitButton,
+      fontSize: '16px',
+      height: '45px',
+      padding: '10px 20px',
+    };
+    styles.linkRow = {
+      ...styles.linkRow,
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+    };
+    styles.checkboxLabel = {
+      ...styles.checkboxLabel,
+      fontSize: '13px',
+    };
+  }
+
+  // Small Mobile (< 576px)
+  if (windowWidth <= 576) {
+    styles.imageColumn = {
+      ...styles.imageColumn,
+      height: '200px',
+    };
+    styles.imageText = {
+      ...styles.imageText,
+      fontSize: '22px',
+    };
+    styles.title = {
+      ...styles.title,
+      fontSize: '22px',
+    };
+    styles.subtitle = {
+      ...styles.subtitle,
+      fontSize: '14px',
+    };
+    styles.formGroup = {
+      ...styles.formGroup,
+      marginBottom: '18px',
+    };
+    styles.input = {
+      ...styles.input,
+      padding: '10px 16px',
+      fontSize: '14px',
+      height: '42px',
+    };
+    styles.submitButton = {
+      ...styles.submitButton,
+      fontSize: '15px',
+      height: '42px',
+    };
+    styles.checkboxContainer = {
+      ...styles.checkboxContainer,
+      gap: '8px',
+      marginBottom: '15px',
+    };
+    styles.checkboxLabel = {
+      ...styles.checkboxLabel,
+      fontSize: '12px',
+    };
+  }
 
   return (
-    <div style={containerStyle}>
-      <div style={formColumnStyle}>
+    <div style={styles.container}>
+      <div style={styles.formColumn}>
         <h1 style={styles.title}>Create an account</h1>
         <p style={styles.subtitle}>Your personal job finder is here</p>
         
@@ -228,7 +337,7 @@ const Register = () => {
               type="text"
               name="name"
               style={styles.input}
-              placeholder="Name"
+              placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
               required
@@ -273,36 +382,35 @@ const Register = () => {
           
           <div style={styles.checkboxContainer}>
             <div 
-              style={checkboxStyle} 
+              style={{
+                ...styles.customCheckbox,
+                ...(formData.agreeToTerms ? styles.checkedCheckbox : {})
+              }}
               onClick={() => setFormData({...formData, agreeToTerms: !formData.agreeToTerms})}
             >
-              {formData.agreeToTerms && (
-                <span style={styles.checkmark}>✓</span>
-              )}
+              {formData.agreeToTerms && <span style={styles.checkmark}>✓</span>}
             </div>
-            <label style={styles.checkboxLabel}>
+            <label 
+              style={styles.checkboxLabel}
+              onClick={() => setFormData({...formData, agreeToTerms: !formData.agreeToTerms})}
+            >
               By creating an account, I agree to our terms of use and privacy policy
             </label>
-            <input
-              type="checkbox"
-              name="agreeToTerms"
-              checked={formData.agreeToTerms}
-              onChange={handleChange}
-              style={{ display: 'none' }}
-            />
           </div>
           
-          <button type="submit" style={styles.submitButton}>Create Account</button>
+          <button type="submit" style={styles.submitButton}>
+            Create Account
+          </button>
           
           <div style={styles.linkRow}>
             <span style={styles.linkText}>Already have an account?</span>
-            <Link to="/login" style={styles.link}>Sign In</Link>
+            <Link to="/login" style={styles.link}>Login</Link>
           </div>
         </form>
       </div>
       
-      <div style={imageColumnStyle}>
-        <h2 style={styles.imageText}>Your Personal Job Finder</h2>
+      <div style={styles.imageColumn}>
+        <div style={styles.imageText}>Find your dream job here</div>
       </div>
     </div>
   );

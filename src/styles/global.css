@@ -45,10 +45,217 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Responsive font sizing */
+/* Common layout utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Responsive breakpoints */
+/* Large Desktop: 1400px+ (no media query needed) */
+/* Desktop: 1200px-1399px */
+/* Small Desktop/Tablet Landscape: 992px-1199px */
+/* Tablet: 768px-991px */
+/* Large Mobile: 576px-767px */
+/* Mobile: 575px and below */
+
+/* Default responsive font sizing */
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+@media (max-width: 1200px) {
+  h1 {
+    font-size: 2.25rem;
+  }
+  
+  h2 {
+    font-size: 1.85rem;
+  }
+  
+  h3 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 992px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.7rem;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+  }
+  
+  h4 {
+    font-size: 1.3rem;
+  }
+}
+
 @media (max-width: 768px) {
   body {
+    font-size: 15px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.3rem;
+  }
+  
+  h4 {
+    font-size: 1.2rem;
+  }
+  
+  .authContainer {
+    flex-direction: column-reverse;
+  }
+  
+  .formSection, .imageSection {
+    width: 100%;
+  }
+  
+  .formSection {
+    padding: 1.5rem;
+  }
+  
+  .imageSection {
+    height: 180px;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
     font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.3rem;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+  }
+  
+  h4 {
+    font-size: 1.1rem;
+  }
+  
+  .formSection {
+    padding: 1.25rem;
+  }
+  
+  .imageSection {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 1.4rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1.15rem;
+  }
+  
+  h4 {
+    font-size: 1.05rem;
+  }
+  
+  .formSection {
+    padding: 1rem;
+  }
+  
+  .imageSection {
+    height: 120px;
+  }
+  
+  /* Adjust button and form element padding for touch targets */
+  button, 
+  input[type="button"], 
+  input[type="submit"] {
+    padding: 0.6rem 1rem;
+    min-height: 42px; /* Ensure good touch target size */
+  }
+  
+  input, 
+  select, 
+  textarea {
+    padding: 0.6rem;
   }
 }
 
@@ -57,6 +264,10 @@ html {
   body {
     background-color: white;
     color: black;
+  }
+  
+  .no-print {
+    display: none;
   }
 }
 
@@ -72,6 +283,10 @@ html {
     color: white !important;
     border: 2px solid black !important;
   }
+  
+  input, select, textarea {
+    border: 2px solid black !important;
+  }
 }
 
 /* Dark mode support */
@@ -80,23 +295,10 @@ html {
     background-color: #121212;
     color: #f5f5f5;
   }
-}
-
-/* Add responsiveness */
-@media (max-width: 768px) {
-  .authContainer {
-    flex-direction: column-reverse;
-  }
   
-  .formSection, .imageSection {
-    width: 100%;
-  }
-  
-  .formSection {
-    padding: 2rem;
-  }
-  
-  .imageSection {
-    height: 200px;
+  input, select, textarea {
+    background-color: #222;
+    color: #f5f5f5;
+    border-color: #444;
   }
 } 

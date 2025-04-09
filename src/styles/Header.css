@@ -84,6 +84,22 @@
 }
 
 /* Responsive styles */
+@media screen and (max-width: 1400px) {
+  .header__shape-left {
+    width: 25%;
+  }
+  
+  .header__shape-middle {
+    width: 30%;
+    left: 35%;
+  }
+  
+  .header__shape-right {
+    width: 30%;
+    left: 70%;
+  }
+}
+
 @media screen and (max-width: 1200px) {
   .header__shape-left,
   .header__shape-middle,
@@ -98,11 +114,47 @@
   .header__shape-right {
     left: 70%;
   }
+  
+  .header__logo {
+    left: 40px;
+  }
+  
+  .header__nav {
+    right: 40px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .header {
+    height: 120px;
+    border-radius: 0px 0px 50px 45px;
+  }
+  
+  .header__logo {
+    font-size: 26px;
+    left: 30px;
+    top: 35px;
+  }
+  
+  .header__nav {
+    right: 30px;
+    top: 35px;
+  }
+  
+  .header__nav-link {
+    font-size: 20px;
+  }
+  
+  .header__login-btn {
+    width: 100px;
+    height: 40px;
+    font-size: 20px;
+  }
 }
 
 @media screen and (max-width: 768px) {
   .header {
-    height: 120px;
+    height: 100px;
     border-radius: 0px 0px 40px 40px;
   }
   
@@ -115,6 +167,7 @@
   .header__nav {
     right: 20px;
     top: 20px;
+    gap: 15px;
   }
   
   .header__nav-link {
@@ -128,22 +181,22 @@
   }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 576px) {
   .header {
-    height: 100px;
-    border-radius: 0px 0px 30px 30px;
+    height: 90px;
+    border-radius: 0px 0px 35px 35px;
   }
   
   .header__logo {
-    font-size: 20px;
-    width: 100%;
-    left: 0;
-    text-align: center;
+    left: 15px;
+    top: 15px;
+    font-size: 22px;
   }
   
   .header__nav {
-    right: 10px;
-    top: 60px;
+    right: 15px;
+    top: 15px;
+    gap: 10px;
   }
   
   .header__nav-link {
@@ -152,7 +205,49 @@
   
   .header__login-btn {
     width: 80px;
-    height: 30px;
+    height: 32px;
     font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .header {
+    height: 80px;
+    border-radius: 0px 0px 30px 30px;
+  }
+  
+  .header__logo {
+    font-size: 20px;
+    left: 10px;
+    top: 10px;
+  }
+  
+  .header__nav {
+    right: 10px;
+    top: 10px;
+    gap: 8px;
+  }
+  
+  .header__nav-link {
+    font-size: 14px;
+    display: none;
+  }
+  
+  .header__login-btn {
+    width: 70px;
+    height: 30px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .header__logo {
+    font-size: 18px;
+  }
+  
+  .header__login-btn {
+    width: 65px;
+    height: 28px;
+    font-size: 13px;
   }
 } 
