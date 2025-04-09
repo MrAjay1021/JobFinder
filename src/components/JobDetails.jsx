@@ -161,12 +161,7 @@ const JobDetails = () => {
             You have already applied for this job
           </div>
         ) : (
-          <button 
-            className="apply-job-btn" 
-            onClick={() => navigate('/login')}
-          >
-            Login to Apply
-          </button>
+          <></>
         )}
       </div>
     </div>

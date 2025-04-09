@@ -359,15 +359,6 @@ const JobViewDetailsWithoutLogin = () => {
               <p style={styles.infoText}>{jobData.additionalInfo}</p>
             </div>
           )}
-
-          {/* Login to Apply Button */}
-          <Link 
-            to="/login" 
-            state={{ returnTo: `/view-job-logged-in/${jobData._id || jobData.id}` }}
-            style={styles.loginToApply}
-          >
-            Login to Apply
-          </Link>
         </div>
       </div>
     </div>
