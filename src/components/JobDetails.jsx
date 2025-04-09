@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { jobsAPI, applicationsAPI } from '../services/api';
 import Header from './Header';
 import '../styles/JobDetails.css';
@@ -12,6 +13,7 @@ const JobDetails = () => {
   const [error, setError] = useState(null);
   const [applying, setApplying] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const { successToast, errorToast } = useToast();
   const navigate = useNavigate();
   
   const isOwner = isAuthenticated && user && job?.postedBy?._id === user._id;
@@ -44,10 +46,10 @@ const JobDetails = () => {
     setApplying(true);
     try {
       await applicationsAPI.submitApplication({ jobId: id });
-      alert('Application submitted successfully!');
+      successToast('Application submitted successfully!');
       fetchJobDetails(); // Refresh to update application status
     } catch (err) {
-      alert('Failed to submit application. Please try again.');
+      errorToast('Failed to submit application. Please try again.');
       console.error(err);
     } finally {
       setApplying(false);

@@ -5,7 +5,7 @@ import '../styles/Dashboard.css';
 
 const JobCard = ({ job }) => {
   const { isAuthenticated, user } = useAuth();
-  const isOwner = isAuthenticated && user && job.postedBy._id === user._id;
+  const isOwner = isAuthenticated && user && job.postedBy?._id === user?._id;
 
   return (
     <div className="job-card">
@@ -58,7 +58,7 @@ const JobCard = ({ job }) => {
             Edit job
           </Link>
         )}
-        <Link to={`/jobs/${job._id}`} className="job-action-btn view-btn">
+        <Link to={isAuthenticated ? `/view-job-logged-in/${job._id}` : `/view-job/${job._id}`} className="job-action-btn view-btn">
           View details
         </Link>
       </div>

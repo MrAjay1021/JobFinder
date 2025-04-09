@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import authBackground from '../assets/images/auth-background.jpg';
 
 const styles = {
@@ -162,6 +163,7 @@ const Register = () => {
   });
   const [error, setError] = useState(null);
   const { register } = useAuth();
+  const { successToast, errorToast } = useToast();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -178,11 +180,12 @@ const Register = () => {
     
     if (!formData.agreeToTerms) {
       setError('You must agree to the terms and conditions');
+      errorToast('You must agree to the terms and conditions');
       return;
     }
     
     try {
-      await register(formData);
+      await register(formData, successToast, errorToast);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');

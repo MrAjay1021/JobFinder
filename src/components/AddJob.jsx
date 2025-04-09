@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import { jobsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import Header from './Header';
 import wallpaperDog from '../assets/images/WallpaperDog.png';
 
@@ -172,6 +173,7 @@ const AddJob = () => {
   const { id } = useParams(); // Get job ID from URL
   const location = useLocation(); // Get location object with state
   const { isAuthenticated, user } = useAuth();
+  const { successToast, errorToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentSkill, setCurrentSkill] = useState('');
   const [formErrors, setFormErrors] = useState({});
@@ -393,12 +395,12 @@ const AddJob = () => {
         // Update existing job
         response = await jobsAPI.updateJob(id, formattedData);
         console.log('Job updated successfully:', response);
-        alert('Job updated successfully!');
+        successToast('Job updated successfully!');
       } else {
         // Create new job
         response = await jobsAPI.createJob(formattedData);
         console.log('Job created successfully:', response);
-        alert('Job posted successfully!');
+        successToast('Job posted successfully!');
       }
       
       navigate('/');
@@ -416,7 +418,7 @@ const AddJob = () => {
         errorMsg += error.message;
       }
       
-      alert(errorMsg);
+      errorToast(errorMsg);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,13 +1,16 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import '../styles/Header.css';
 
 const Header = () => {
   const { user, logout, isAuthenticated } = useAuth();
+  const { successToast } = useToast();
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    successToast('Logged out successfully');
     logout();
     navigate('/');
   };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import authBackground from '../assets/images/auth-background.jpg';
 
 const styles = {
@@ -128,6 +129,7 @@ const Login = () => {
   });
   const [error, setError] = useState(null);
   const { login } = useAuth();
+  const { successToast, errorToast } = useToast();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -143,10 +145,10 @@ const Login = () => {
     setError(null);
     
     try {
-      await login(formData);
+      await login(formData, successToast, errorToast);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     }
   };
 

@@ -387,6 +387,7 @@ const MainPage = () => {
   const fetchJobs = async (queryFilters = {}) => {
     setLoading(true);
     try {
+      // For MainPage we want to show all jobs (not just user's own)
       const response = await jobsAPI.getAllJobs(queryFilters);
       setJobs(response.data);
       setError(null);
@@ -627,7 +628,7 @@ const MainPage = () => {
                   </div>
                   
                   <div style={styles.cardFooter}>
-                    <Link to={`/view-job-logged-in/${job._id}`} style={styles.viewDetailsButton}>
+                    <Link to={isAuthenticated ? `/view-job-logged-in/${job._id}` : `/view-job/${job._id}`} style={styles.viewDetailsButton}>
                       View details
                     </Link>
                   </div>

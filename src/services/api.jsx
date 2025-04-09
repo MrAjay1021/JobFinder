@@ -14,12 +14,38 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    
+    // Debug token usage
+    console.log(`API Request to ${config.url}:`, { 
+      hasToken: !!token,
+      tokenPreview: token ? `${token.substring(0, 10)}...` : 'none'
+    });
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log(`API Response from ${response.config.url}:`, {
+      status: response.status,
+      dataSize: JSON.stringify(response.data).length
+    });
+    return response;
+  },
+  (error) => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message
+    });
     return Promise.reject(error);
   }
 );
@@ -35,6 +61,7 @@ export const authAPI = {
 // Jobs API
 export const jobsAPI = {
   getAllJobs: (filters) => api.get('/jobs', { params: filters }),
+  getUserJobs: () => api.get('/jobs/user'),
   getJobById: (id) => api.get(`/jobs/${id}`),
   createJob: (jobData) => api.post('/jobs', jobData),
   updateJob: (id, jobData) => api.put(`/jobs/${id}`, jobData),

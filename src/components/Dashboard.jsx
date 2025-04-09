@@ -14,21 +14,40 @@ const Dashboard = () => {
   const [filters, setFilters] = useState({
     skills: []
   });
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
+    // Refetch jobs whenever the authenticated user changes
+    console.log('Dashboard - User or auth status changed:', { userId: user?.id, isAuthenticated });
+    
+    // Reset job list when logging out
+    if (!isAuthenticated) {
+      setJobs([]);
+    }
+    
     fetchJobs();
-  }, []);
+  }, [isAuthenticated, user?.id]); // Add user.id as a dependency to refetch when user changes
 
   const fetchJobs = async (queryFilters = {}) => {
     setLoading(true);
     try {
-      const response = await jobsAPI.getAllJobs(queryFilters);
+      // Add console logs for debugging
+      console.log('Dashboard - Auth Status:', { isAuthenticated, userId: user?.id });
+      console.log('Dashboard - Token:', localStorage.getItem('token'));
+      
+      // If user is authenticated, fetch only their jobs using the user-specific endpoint
+      // Otherwise, fetch all public jobs
+      const response = isAuthenticated
+        ? await jobsAPI.getUserJobs()
+        : await jobsAPI.getAllJobs(queryFilters);
+      
+      console.log('Dashboard - Fetched Jobs:', response.data);
+      
       setJobs(response.data);
       setError(null);
     } catch (err) {
+      console.error('Dashboard - Error fetching jobs:', err);
       setError('Failed to fetch jobs. Please try again later.');
-      console.error(err);
     } finally {
       setLoading(false);
     }
