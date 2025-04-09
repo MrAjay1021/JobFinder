@@ -2,9 +2,7 @@ import axios from 'axios';
 
 // For production use the API relative URL which gets rewritten by Vercel
 // For development use the full localhost URL
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? '/api' 
-  : 'http://localhost:5000/api';
+const API_URL = 'https://jobfinder-backend1021.onrender.com/api';
 
 console.log('API URL configured as:', API_URL);
 
