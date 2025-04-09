@@ -387,8 +387,10 @@ const MainPage = () => {
   const fetchJobs = async (queryFilters = {}) => {
     setLoading(true);
     try {
-      // For MainPage we want to show all jobs (not just user's own)
-      const response = await jobsAPI.getAllJobs(queryFilters);
+      // If authenticated, fetch only user's jobs, otherwise fetch all jobs
+      const response = isAuthenticated
+        ? await jobsAPI.getUserJobs(queryFilters) 
+        : await jobsAPI.getAllJobs(queryFilters);
       setJobs(response.data);
       setError(null);
     } catch (err) {
@@ -472,6 +474,25 @@ const MainPage = () => {
 
       {/* Main Content */}
       <div style={styles.content}>
+        {isAuthenticated && (
+          <div style={{
+            backgroundColor: '#f8f9fa',
+            padding: '15px 20px',
+            marginBottom: '20px',
+            borderRadius: '5px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <h2 style={{ margin: 0, color: '#333', fontSize: '18px' }}>
+              My Job Dashboard
+            </h2>
+            <div style={{ color: '#666', fontSize: '14px' }}>
+              You are viewing only jobs that you have created
+            </div>
+          </div>
+        )}
+        
         <div style={styles.searchContainer}>
           <form style={styles.searchBox} onSubmit={handleSearchSubmit}>
             <input
@@ -585,7 +606,11 @@ const MainPage = () => {
           ) : error ? (
             <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>{error}</div>
           ) : jobs.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '20px' }}>No jobs found</div>
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              {isAuthenticated ? 
+                "You haven't created any jobs yet. Click the '+' button to add a new job." : 
+                "No jobs found with the current filters."}
+            </div>
           ) : (
             jobs.map(job => (
               <div key={job._id} style={styles.jobCard}>

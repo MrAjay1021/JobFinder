@@ -228,8 +228,18 @@ const JobViewDetailsWithLogin = () => {
       try {
         // Attempt to get the job from the API
         const response = await jobsAPI.getJobById(id);
-        setJobData(response.data);
-        setError(null);
+        
+        // Check if this job belongs to the current user
+        if (response.data.postedBy && user && response.data.postedBy._id === user.id) {
+          setJobData(response.data);
+          setError(null);
+        } else {
+          // If the job doesn't belong to the user, show error and redirect
+          setError('This job does not belong to your account');
+          setTimeout(() => {
+            navigate('/');
+          }, 3000);
+        }
       } catch (err) {
         console.error('Error fetching job data:', err);
         setError('Failed to load job details');
@@ -246,7 +256,7 @@ const JobViewDetailsWithLogin = () => {
     };
     
     fetchJobData();
-  }, [id]);
+  }, [id, user, navigate]);
 
   // Mock data as fallback
   const wordpressJobData = {
