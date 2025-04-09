@@ -224,7 +224,7 @@ const styles = {
     overflow: 'hidden',
     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
     position: 'relative',
-    padding: '20px',
+    padding: '15px',
     border: '1px solid #f0f0f0',
     backgroundColor: '#fff5f5',
   },
@@ -237,8 +237,8 @@ const styles = {
     backgroundColor: '#f05252',
   },
   companyLogo: {
-    width: '60px',
-    height: '60px',
+    width: '50px',
+    height: '50px',
     borderRadius: '8px',
     overflow: 'hidden',
     display: 'flex',
@@ -251,7 +251,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: '5px',
   },
   jobTitle: {
     fontSize: '18px',
@@ -274,7 +274,7 @@ const styles = {
   tagRow: {
     display: 'flex',
     gap: '10px',
-    marginTop: '5px',
+    marginTop: '3px',
   },
   typeTag: {
     padding: '4px 10px',
@@ -285,11 +285,11 @@ const styles = {
   skillTags: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '8px',
-    marginTop: '10px',
+    gap: '6px',
+    marginTop: '6px',
   },
   skillTag: {
-    padding: '5px 15px',
+    padding: '3px 10px',
     backgroundColor: '#ffebee',
     color: '#333',
     borderRadius: '20px',
@@ -298,14 +298,14 @@ const styles = {
   cardFooter: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginTop: '15px',
+    marginTop: '10px',
   },
   viewDetailsButton: {
     backgroundColor: '#f05252',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
-    padding: '8px 16px',
+    padding: '6px 14px',
     cursor: 'pointer',
     textDecoration: 'none',
     fontSize: '14px',
@@ -492,7 +492,7 @@ const MainPage = () => {
               My Job Dashboard
             </h2>
             <div style={{ color: '#666', fontSize: '14px' }}>
-              You are viewing only jobs that you have created
+              You are viewing jobs that you have created. You can still view details of any job.
             </div>
           </div>
         )}
@@ -657,6 +657,21 @@ const MainPage = () => {
                   </div>
                   
                   <div style={styles.cardFooter}>
+                    {isAuthenticated && (
+                      <Link 
+                        to={`/edit-job/${job._id}`} 
+                        state={{ jobData: job }}
+                        style={{
+                          ...styles.viewDetailsButton,
+                          backgroundColor: 'white',
+                          color: '#f05252',
+                          border: '1px solid #f05252',
+                          marginRight: '10px'
+                        }}
+                      >
+                        Edit job
+                      </Link>
+                    )}
                     <Link to={isAuthenticated ? `/view-job-logged-in/${job._id}` : `/view-job/${job._id}`} style={styles.viewDetailsButton}>
                       View details
                     </Link>
