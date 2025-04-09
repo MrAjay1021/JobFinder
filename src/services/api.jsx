@@ -1,7 +1,12 @@
 import axios from 'axios';
 
-// Fix the port mismatch - ensure consistent port with backend
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// For production use the API relative URL which gets rewritten by Vercel
+// For development use the full localhost URL
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? '/api' 
+  : 'http://localhost:5000/api';
+
+console.log('API URL configured as:', API_URL);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -19,7 +24,8 @@ api.interceptors.request.use(
     // Debug token usage
     console.log(`API Request to ${config.url}:`, { 
       hasToken: !!token,
-      tokenPreview: token ? `${token.substring(0, 10)}...` : 'none'
+      tokenPreview: token ? `${token.substring(0, 10)}...` : 'none',
+      baseURL: config.baseURL
     });
     
     if (token) {
@@ -45,7 +51,8 @@ api.interceptors.response.use(
     console.error('API Error:', {
       url: error.config?.url,
       status: error.response?.status,
-      message: error.response?.data?.message || error.message
+      message: error.response?.data?.message || error.message,
+      baseURL: error.config?.baseURL
     });
     return Promise.reject(error);
   }
