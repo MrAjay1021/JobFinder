@@ -384,7 +384,7 @@ const MainPage = () => {
   }, [isAuthenticated]);
   
   // Fetch jobs function
-  const fetchJobs = async (queryFilters = {}) => {
+  const fetchJobs = async (queryFilters = {}, retryCount = 0) => {
     setLoading(true);
     try {
       // If authenticated, fetch only user's jobs, otherwise fetch all jobs
@@ -394,10 +394,21 @@ const MainPage = () => {
       setJobs(response.data);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch jobs. Please try again later.');
       console.error(err);
+      // Implement retry logic (max 3 retries)
+      if (retryCount < 3) {
+        console.log(`Retrying job fetch (attempt ${retryCount + 1}/3)...`);
+        // Wait 1 second before retrying
+        setTimeout(() => {
+          fetchJobs(queryFilters, retryCount + 1);
+        }, 1000);
+      } else {
+        setError('Failed to fetch jobs. Please try refreshing the page.');
+      }
     } finally {
-      setLoading(false);
+      if (retryCount === 0 || retryCount >= 3) {
+        setLoading(false);
+      }
     }
   };
 
@@ -488,11 +499,26 @@ const MainPage = () => {
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            <h2 style={{ margin: 0, color: '#333', fontSize: '18px' }}>
+            <h2 style={{ 
+              margin: 0, 
+              color: '#f05252', 
+              fontSize: '18px',
+              fontWeight: '600',
+              borderLeft: '3px solid #f05252',
+              paddingLeft: '10px'
+            }}>
               My Job Dashboard
             </h2>
-            <div style={{ color: '#666', fontSize: '14px' }}>
-              You are viewing jobs that you have created. You can still view details of any job.
+            <div style={{ 
+              color: '#666', 
+              fontSize: '14px',
+              fontWeight: '500',
+              backgroundColor: '#ffebee',
+              padding: '5px 15px',
+              borderRadius: '4px',
+              color: '#f05252'
+            }}>
+              You are viewing jobs that you have created
             </div>
           </div>
         )}
@@ -608,7 +634,14 @@ const MainPage = () => {
           {loading ? (
             <div style={{ textAlign: 'center', padding: '20px' }}>Loading jobs...</div>
           ) : error ? (
-            <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>{error}</div>
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>
+              {isAuthenticated && (
+                <Link to="/post-job" style={{...styles.viewDetailsButton, display: 'inline-block', marginTop: '10px'}}>
+                  Create a new job
+                </Link>
+              )}
+            </div>
           ) : jobs.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '20px' }}>
               {isAuthenticated ? 
